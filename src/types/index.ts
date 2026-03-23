@@ -156,6 +156,8 @@ export const DEFAULT_FIELD_DEFINITIONS: FieldDefinition[] = [
   { id: 'remark',      name: 'remark',      label: 'Remark',           type: 'string',   enabled: true,  isBuiltIn: true },
   { id: 'sched_hhmm',  name: 'schedule',    label: 'Sched. Time',      type: 'datetime', dateFormat: 'HH:mm', enabled: true,  isBuiltIn: true },
   { id: 'estim_hhmm',  name: 'actual',      label: 'Est. Time',        type: 'datetime', dateFormat: 'HH:mm', enabled: true,  isBuiltIn: true },
+  { id: 'onchk',       name: 'onchk',       label: 'On-Chocks',        type: 'datetime', dateFormat: 'HH:mm', enabled: true,  isBuiltIn: true },
+  { id: 'ofchk',       name: 'ofchk',       label: 'Off-Chocks',       type: 'datetime', dateFormat: 'HH:mm', enabled: true,  isBuiltIn: true },
 ];
 
 // ─── Sort config ──────────────────────────────────────────────────────────────

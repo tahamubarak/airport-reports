@@ -7,6 +7,8 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
+  Settings,
+  RefreshCw,
 } from 'lucide-react';
 import { FilterBar } from '../components/FilterBar';
 import { Badge, AdiBadge } from '../components/ui/Badge';
@@ -14,6 +16,7 @@ import { Button } from '../components/ui/Button';
 import { LoadingSpinner, ErrorState } from '../components/ui/LoadingSpinner';
 import { useFlights } from '../hooks/useFlights';
 import { useSessionStore } from '../store/useSessionStore';
+import { usePersistedConfig } from '../hooks/usePersistedConfig';
 import { FilterState, Flight } from '../types';
 import { ExportMenu } from '../components/ui/ExportMenu';
 import { useSettingsStore } from '../store/useSettingsStore';
@@ -21,8 +24,14 @@ import { format, parseISO, addDays } from 'date-fns';
 
 const PAGE_SIZE = 50;
 
-type SortKey = keyof Flight;
+type SortKey = string;
 type SortDir = 'asc' | 'desc';
+
+const DEFAULTS = {
+  standField: 'parkingbay',
+  onchkField: 'onchk',
+  ofchkField: 'ofchk',
+};
 
 const DEFAULT_FILTERS: FilterState = {
   dateRange: { startDate: new Date(), endDate: addDays(new Date(), 1) },
@@ -54,8 +63,29 @@ export const FlightOperationsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [sortKey, setSortKey] = useState<SortKey>('schedule');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const { config: fieldConfig, apply: applyFieldConfig } = usePersistedConfig('flight_operations', DEFAULTS);
+  const [draft, setDraft] = useState(DEFAULTS);
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
   const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
+
+  // Sync draft when persisted config loads
+  const cfgStr = JSON.stringify(fieldConfig);
+  useEffect(() => { try { setDraft(JSON.parse(cfgStr)); } catch {} }, [cfgStr]); // eslint-disable-line
+
+  const handleApply = () => applyFieldConfig({ ...draft });
+
+  const inp = (label: string, key: keyof typeof draft, placeholder: string) => (
+    <div className="flex items-center gap-2">
+      <label className="text-slate-500 text-xs whitespace-nowrap">{label}:</label>
+      <input
+        value={draft[key]}
+        onChange={e => setDraft(d => ({ ...d, [key]: e.target.value }))}
+        onKeyDown={e => e.key === 'Enter' && handleApply()}
+        className="w-28 text-xs font-mono border border-slate-300 bg-white rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        placeholder={placeholder}
+      />
+    </div>
+  );
 
   useEffect(() => {
     fetchFlights(filters.dateRange);
@@ -108,15 +138,18 @@ export const FlightOperationsPage: React.FC = () => {
   useEffect(() => { setPage(1); }, [filters]);
 
   const columns: { key: SortKey; label: string; width?: string }[] = [
-    { key: 'linecode', label: 'Flight', width: 'w-24' },
-    { key: 'adi', label: 'ADI', width: 'w-20' },
-    { key: 'city', label: 'City', width: 'w-16' },
-    { key: 'gate', label: 'Gate', width: 'w-16' },
-    { key: 'claim', label: 'Claim', width: 'w-16' },
-    { key: 'schedule', label: 'Scheduled', width: 'w-28' },
-    { key: 'actual', label: 'Actual', width: 'w-28' },
-    { key: 'delayMinutes', label: 'Delay', width: 'w-20' },
-    { key: 'status', label: 'Status', width: 'w-28' },
+    { key: 'linecode',                    label: 'Flight',    width: 'w-24' },
+    { key: 'adi',                         label: 'ADI',       width: 'w-20' },
+    { key: 'city',                        label: 'City',      width: 'w-16' },
+    { key: 'gate',                        label: 'Gate',      width: 'w-16' },
+    { key: fieldConfig.standField,        label: 'Stand',     width: 'w-16' },
+    { key: 'claim',                       label: 'Claim',     width: 'w-16' },
+    { key: 'schedule',                    label: 'Scheduled', width: 'w-28' },
+    { key: 'actual',                      label: 'Actual',    width: 'w-28' },
+    { key: fieldConfig.onchkField,        label: 'ONCHK',     width: 'w-24' },
+    { key: fieldConfig.ofchkField,        label: 'OFCHK',     width: 'w-24' },
+    { key: 'delayMinutes',                label: 'Delay',     width: 'w-20' },
+    { key: 'status',                      label: 'Status',    width: 'w-28' },
   ];
 
   return (
@@ -127,6 +160,34 @@ export const FlightOperationsPage: React.FC = () => {
           <span className="text-amber-800"><strong>Demo Mode:</strong> Showing simulated data due to CORS restrictions.</span>
         </div>
       )}
+
+      {/* Field config bar */}
+      <div className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm space-y-2">
+        <div className="flex items-center gap-2 text-slate-600 font-medium">
+          <Settings className="w-4 h-4 text-slate-400" />
+          Field Names
+        </div>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 items-center">
+          {inp('Stand field', 'standField', 'parkingbay')}
+          {inp('ONCHK field', 'onchkField', 'onchk')}
+          {inp('OFCHK field', 'ofchkField', 'ofchk')}
+          <button
+            onClick={handleApply}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors self-center"
+          >
+            <RefreshCw className="w-3 h-3" />
+            Apply
+          </button>
+          {JSON.stringify(fieldConfig) !== JSON.stringify(DEFAULTS) && (
+            <button
+              onClick={() => { applyFieldConfig(DEFAULTS); setDraft(DEFAULTS); }}
+              className="text-xs text-slate-400 hover:text-slate-600 underline self-center"
+            >
+              Reset defaults
+            </button>
+          )}
+        </div>
+      </div>
 
       <FilterBar
         filters={filters}
@@ -210,6 +271,9 @@ export const FlightOperationsPage: React.FC = () => {
                           </span>
                         ) : '—'}
                       </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {String((flight as Record<string, unknown>)[fieldConfig.standField] ?? '') || '—'}
+                      </td>
                       <td className="px-4 py-3 text-slate-600">{flight.claim || '—'}</td>
                       <td className="px-4 py-3">
                         <div className="font-medium text-slate-800">{formatTime(flight.schedule)}</div>
@@ -223,6 +287,12 @@ export const FlightOperationsPage: React.FC = () => {
                         }`}>
                           {flight.actual ? formatTime(flight.actual) : '—'}
                         </div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 font-mono text-xs">
+                        {(() => { const v = String((flight as Record<string, unknown>)[fieldConfig.onchkField] ?? ''); return v ? formatTime(v) : '—'; })()}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 font-mono text-xs">
+                        {(() => { const v = String((flight as Record<string, unknown>)[fieldConfig.ofchkField] ?? ''); return v ? formatTime(v) : '—'; })()}
                       </td>
                       <td className="px-4 py-3">
                         {flight.status === 'Cancelled' ? (
