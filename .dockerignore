@@ -1,0 +1,9 @@
+node_modules
+api/node_modules
+api/dist
+dist
+.env
+.env.local
+api/.env
+*.md
+.git

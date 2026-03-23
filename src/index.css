@@ -1,0 +1,403 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   THEME VARIABLES
+   Each theme sets CSS custom properties used by component overrides below.
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Pearl (default light) ─────────────────────────────────────────────────── */
+:root, [data-theme="pearl"] {
+  --th-body:          #f1f5f9;
+  --th-surface:       #ffffff;
+  --th-surface-2:     #f8fafc;
+  --th-surface-3:     #f1f5f9;
+  --th-border:        #e2e8f0;
+  --th-border-2:      #f1f5f9;
+  --th-text-1:        #0f172a;
+  --th-text-2:        #334155;
+  --th-text-3:        #64748b;
+  --th-text-4:        #94a3b8;
+  --th-accent:        #2563eb;
+  --th-accent-bg:     #eff6ff;
+  --th-accent-text:   #1d4ed8;
+  --th-sidebar:       #0f172a;
+  --th-sidebar-hover: #1e293b;
+  --th-sidebar-text:  #94a3b8;
+  /* Table */
+  --th-tbl-header:    #e2e8f0;
+  --th-tbl-header-fg: #334155;
+  --th-tbl-border:    #cbd5e1;
+  --th-tbl-hover:     #f0f9ff;
+  --th-tbl-stripe:    #f8fafc;
+  /* Inputs */
+  --th-input:         #ffffff;
+  --th-input-border:  #cbd5e1;
+  /* Scrollbar */
+  --th-scroll:        #cbd5e1;
+  --th-scroll-hover:  #94a3b8;
+}
+
+/* ── Onyx (dark charcoal) ──────────────────────────────────────────────────── */
+[data-theme="onyx"] {
+  --th-body:          #0d1117;
+  --th-surface:       #161b22;
+  --th-surface-2:     #1c2128;
+  --th-surface-3:     #21262d;
+  --th-border:        #30363d;
+  --th-border-2:      #21262d;
+  --th-text-1:        #e6edf3;
+  --th-text-2:        #c9d1d9;
+  --th-text-3:        #8b949e;
+  --th-text-4:        #6e7681;
+  --th-accent:        #58a6ff;
+  --th-accent-bg:     rgba(88,166,255,0.1);
+  --th-accent-text:   #79c0ff;
+  --th-sidebar:       #010409;
+  --th-sidebar-hover: #1c2128;
+  --th-sidebar-text:  #8b949e;
+  --th-tbl-header:    #1c2128;
+  --th-tbl-header-fg: #8b949e;
+  --th-tbl-border:    #30363d;
+  --th-tbl-hover:     rgba(88,166,255,0.05);
+  --th-tbl-stripe:    #0d1117;
+  --th-input:         #1c2128;
+  --th-input-border:  #30363d;
+  --th-scroll:        #30363d;
+  --th-scroll-hover:  #484f58;
+}
+
+/* ── Navy (deep sea professional) ─────────────────────────────────────────── */
+[data-theme="navy"] {
+  --th-body:          #080f1f;
+  --th-surface:       #0d1b38;
+  --th-surface-2:     #0a1628;
+  --th-surface-3:     #0f2044;
+  --th-border:        rgba(56,189,248,0.12);
+  --th-border-2:      rgba(56,189,248,0.07);
+  --th-text-1:        #e2f0ff;
+  --th-text-2:        #bfdbfe;
+  --th-text-3:        #7dd3fc;
+  --th-text-4:        #38bdf8;
+  --th-accent:        #38bdf8;
+  --th-accent-bg:     rgba(56,189,248,0.1);
+  --th-accent-text:   #7dd3fc;
+  --th-sidebar:       #04091a;
+  --th-sidebar-hover: rgba(56,189,248,0.08);
+  --th-sidebar-text:  #4d7fa8;
+  --th-tbl-header:    #0a1e40;
+  --th-tbl-header-fg: #7dd3fc;
+  --th-tbl-border:    rgba(56,189,248,0.15);
+  --th-tbl-hover:     rgba(56,189,248,0.05);
+  --th-tbl-stripe:    rgba(56,189,248,0.02);
+  --th-input:         #0d1b38;
+  --th-input-border:  rgba(56,189,248,0.2);
+  --th-scroll:        #1e3a5f;
+  --th-scroll-hover:  #2d5a8e;
+}
+
+/* ── Aurora (midnight violet) ─────────────────────────────────────────────── */
+[data-theme="aurora"] {
+  --th-body:          #08080f;
+  --th-surface:       #10101e;
+  --th-surface-2:     #13132a;
+  --th-surface-3:     #1a1535;
+  --th-border:        rgba(139,92,246,0.18);
+  --th-border-2:      rgba(139,92,246,0.08);
+  --th-text-1:        #f0effe;
+  --th-text-2:        #ddd6fe;
+  --th-text-3:        #c4b5fd;
+  --th-text-4:        #a78bfa;
+  --th-accent:        #8b5cf6;
+  --th-accent-bg:     rgba(139,92,246,0.12);
+  --th-accent-text:   #c4b5fd;
+  --th-sidebar:       #050510;
+  --th-sidebar-hover: rgba(139,92,246,0.1);
+  --th-sidebar-text:  #6d5fb3;
+  --th-tbl-header:    #13132a;
+  --th-tbl-header-fg: #c4b5fd;
+  --th-tbl-border:    rgba(139,92,246,0.2);
+  --th-tbl-hover:     rgba(139,92,246,0.06);
+  --th-tbl-stripe:    rgba(139,92,246,0.02);
+  --th-input:         #13132a;
+  --th-input-border:  rgba(139,92,246,0.25);
+  --th-scroll:        #312e81;
+  --th-scroll-hover:  #4338ca;
+}
+
+/* ── Dusk (warm ember) ────────────────────────────────────────────────────── */
+[data-theme="dusk"] {
+  --th-body:          #100c09;
+  --th-surface:       #1c1612;
+  --th-surface-2:     #231d17;
+  --th-surface-3:     #2a2118;
+  --th-border:        rgba(245,158,11,0.12);
+  --th-border-2:      rgba(245,158,11,0.06);
+  --th-text-1:        #fafaf9;
+  --th-text-2:        #e7e5e4;
+  --th-text-3:        #d6d3d1;
+  --th-text-4:        #a8a29e;
+  --th-accent:        #f59e0b;
+  --th-accent-bg:     rgba(245,158,11,0.1);
+  --th-accent-text:   #fbbf24;
+  --th-sidebar:       #080604;
+  --th-sidebar-hover: rgba(245,158,11,0.08);
+  --th-sidebar-text:  #78716c;
+  --th-tbl-header:    #1f1812;
+  --th-tbl-header-fg: #d97706;
+  --th-tbl-border:    rgba(245,158,11,0.15);
+  --th-tbl-hover:     rgba(245,158,11,0.05);
+  --th-tbl-stripe:    rgba(245,158,11,0.02);
+  --th-input:         #231d17;
+  --th-input-border:  rgba(245,158,11,0.2);
+  --th-scroll:        #44403c;
+  --th-scroll-hover:  #78716c;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   BASE RESETS
+══════════════════════════════════════════════════════════════════════════════ */
+
+@layer base {
+  * { box-sizing: border-box; }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply font-sans;
+    margin: 0;
+    padding: 0;
+    background-color: var(--th-body);
+    color: var(--th-text-1);
+    transition: background-color 0.25s, color 0.25s;
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--th-scroll);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background-color: var(--th-scroll-hover); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   THEME OVERRIDES — remap Tailwind utility classes per dark theme
+   Targets any non-Pearl theme. Pearl uses the Tailwind defaults as-is.
+══════════════════════════════════════════════════════════════════════════════ */
+
+[data-theme]:not([data-theme="pearl"]) {
+
+  /* ── Backgrounds ─────────────────────────────────────────────────────────── */
+  .bg-white                 { background-color: var(--th-surface) !important; }
+  .bg-slate-50              { background-color: var(--th-surface-2) !important; }
+  .bg-slate-100             { background-color: var(--th-surface-3) !important; }
+  .bg-slate-200             { background-color: var(--th-border) !important; }
+  .hover\:bg-slate-50:hover { background-color: var(--th-tbl-hover) !important; }
+  .hover\:bg-slate-100:hover{ background-color: var(--th-surface-3) !important; }
+
+  /* ── Text ────────────────────────────────────────────────────────────────── */
+  .text-slate-900, .text-slate-800 { color: var(--th-text-1) !important; }
+  .text-slate-700           { color: var(--th-text-2) !important; }
+  .text-slate-600           { color: var(--th-text-3) !important; }
+  .text-slate-500           { color: var(--th-text-3) !important; }
+  .text-slate-400           { color: var(--th-text-4) !important; }
+
+  /* ── Borders & dividers ──────────────────────────────────────────────────── */
+  .border-slate-300, .border-slate-200 { border-color: var(--th-border) !important; }
+  .border-slate-100         { border-color: var(--th-border-2) !important; }
+  .divide-slate-50  > * + * { border-color: var(--th-border-2) !important; }
+  .divide-slate-100 > * + * { border-color: var(--th-border) !important; }
+  .divide-slate-200 > * + * { border-color: var(--th-border) !important; }
+
+  /* ── Sidebar ─────────────────────────────────────────────────────────────── */
+  .bg-slate-900             { background-color: var(--th-sidebar) !important; }
+  .bg-slate-800             { background-color: var(--th-sidebar-hover) !important; }
+  .border-slate-800         { border-color: rgba(255,255,255,0.06) !important; }
+  .hover\:bg-slate-800:hover{ background-color: var(--th-sidebar-hover) !important; }
+  .text-slate-500.border-t  { border-color: rgba(255,255,255,0.06) !important; }
+  .bg-slate-700             { background-color: var(--th-sidebar-hover) !important; }
+
+  /* ── Inputs & selects ────────────────────────────────────────────────────── */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not([type="range"]),
+  select,
+  textarea {
+    background-color: var(--th-input) !important;
+    color: var(--th-text-1) !important;
+    border-color: var(--th-input-border) !important;
+  }
+  input::placeholder, textarea::placeholder { color: var(--th-text-4) !important; }
+
+  /* ── Accent (blue) elements ─────────────────────────────────────────────── */
+  .bg-blue-50               { background-color: var(--th-accent-bg) !important; }
+  .text-blue-700            { color: var(--th-accent-text) !important; }
+  .text-blue-600            { color: var(--th-accent) !important; }
+  .border-blue-200          { border-color: var(--th-accent-bg) !important; }
+  .bg-blue-100              { background-color: var(--th-accent-bg) !important; }
+
+  /* ── Shadow adjustments ──────────────────────────────────────────────────── */
+  .shadow-sm  { box-shadow: 0 1px 3px rgba(0,0,0,0.4) !important; }
+  .shadow-md  { box-shadow: 0 4px 8px rgba(0,0,0,0.5) !important; }
+
+  /* ── Top bar & header ────────────────────────────────────────────────────── */
+  header.bg-white { background-color: var(--th-surface) !important; }
+
+  /* ── Modals / overlays ───────────────────────────────────────────────────── */
+  .bg-black\/50 { background-color: rgba(0,0,0,0.7) !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   TABLE GRID IMPROVEMENTS — applied to ALL themes
+   Adds visible cell borders, distinct header, and clean hover row highlight.
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* Scope to data tables inside main content (avoids recharts SVG etc.) */
+main table,
+.table-grid {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* ── Column headers ──────────────────────────────────────────────────────── */
+main table thead,
+main table thead tr {
+  background-color: var(--th-tbl-header) !important;
+}
+
+main table thead th {
+  background-color: transparent;
+  color: var(--th-tbl-header-fg) !important;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 16px;
+  border: 1px solid var(--th-tbl-border);
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Pearl theme: give the header a stronger distinction with a left accent bar */
+[data-theme="pearl"] main table thead th:first-child,
+:root main table thead th:first-child {
+  border-left: 3px solid var(--th-accent);
+}
+
+/* ── Body cells ──────────────────────────────────────────────────────────── */
+main table tbody td {
+  border: 1px solid var(--th-tbl-border);
+  padding: 9px 16px;
+}
+
+/* ── Row hover ───────────────────────────────────────────────────────────── */
+main table tbody tr {
+  transition: background-color 0.12s;
+}
+
+main table tbody tr:hover {
+  background-color: var(--th-tbl-hover) !important;
+}
+
+/* ── Zebra stripe ────────────────────────────────────────────────────────── */
+main table tbody tr:nth-child(even) {
+  background-color: var(--th-tbl-stripe);
+}
+
+/* ── Bottom border on last row ───────────────────────────────────────────── */
+main table tbody tr:last-child td {
+  border-bottom: 2px solid var(--th-tbl-border);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   ANIMATION
+══════════════════════════════════════════════════════════════════════════════ */
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   REACT DATEPICKER OVERRIDES
+══════════════════════════════════════════════════════════════════════════════ */
+
+.react-datepicker {
+  font-family: inherit !important;
+  border: 1px solid var(--th-border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+  overflow: hidden;
+  background-color: var(--th-surface) !important;
+  color: var(--th-text-1) !important;
+}
+
+.react-datepicker__header {
+  background-color: var(--th-surface-3) !important;
+  border-bottom: 1px solid var(--th-border) !important;
+  padding-top: 12px !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: var(--th-text-1) !important;
+  font-weight: 600 !important;
+}
+
+.react-datepicker__day {
+  color: var(--th-text-2) !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-range {
+  background-color: var(--th-accent) !important;
+  color: white !important;
+  border-radius: 6px !important;
+}
+
+.react-datepicker__day--in-selecting-range {
+  background-color: var(--th-accent-bg) !important;
+  color: var(--th-accent-text) !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: var(--th-accent-bg) !important;
+  border-radius: 6px !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--th-accent-bg) !important;
+  color: var(--th-accent-text) !important;
+  border-radius: 6px !important;
+}
+
+.react-datepicker__navigation-icon::before {
+  border-color: var(--th-text-3) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   THEME SWITCHER PILL (applied directly, no Tailwind override needed)
+══════════════════════════════════════════════════════════════════════════════ */
+
+.theme-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  flex-shrink: 0;
+}
+
+.theme-switcher-panel {
+  background-color: var(--th-surface);
+  border: 1px solid var(--th-border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}

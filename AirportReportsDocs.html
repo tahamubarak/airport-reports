@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Airport Operations Dashboard — Technical Documentation</title>
+  <style>
+    /* ── Word-compatible base styles ── */
+    body {
+      font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a2e;
+      margin: 0;
+      padding: 0;
+      background: #ffffff;
+    }
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 50px;
+    }
+
+    /* ── Cover block ── */
+    .cover {
+      background: linear-gradient(135deg, #0f2044 0%, #1a3a6b 60%, #1d4ed8 100%);
+      color: #ffffff;
+      padding: 60px 50px 50px 50px;
+      margin-bottom: 40px;
+    }
+    .cover h1 {
+      font-size: 28pt;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+      color: #ffffff;
+      border: none;
+    }
+    .cover .subtitle {
+      font-size: 14pt;
+      color: #93c5fd;
+      margin: 0 0 30px 0;
+    }
+    .cover .meta-row {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    .cover .meta-item {
+      font-size: 10pt;
+      color: #bfdbfe;
+    }
+    .cover .meta-item strong {
+      color: #ffffff;
+      display: block;
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+
+    /* ── Headings ── */
+    h1, h2, h3, h4 {
+      font-family: Calibri, 'Segoe UI', Arial, sans-serif;
+      page-break-after: avoid;
+    }
+    h1 {
+      font-size: 20pt;
+      color: #0f2044;
+      border-bottom: 3px solid #1d4ed8;
+      padding-bottom: 8px;
+      margin-top: 40px;
+      margin-bottom: 16px;
+    }
+    h2 {
+      font-size: 15pt;
+      color: #1a3a6b;
+      border-left: 4px solid #1d4ed8;
+      padding-left: 12px;
+      margin-top: 30px;
+      margin-bottom: 12px;
+    }
+    h3 {
+      font-size: 12pt;
+      color: #1e40af;
+      margin-top: 22px;
+      margin-bottom: 8px;
+    }
+    h4 {
+      font-size: 11pt;
+      color: #1d4ed8;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 10pt;
+    }
+    th {
+      background-color: #1a3a6b;
+      color: #ffffff;
+      padding: 8px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 10pt;
+    }
+    td {
+      padding: 7px 12px;
+      border: 1px solid #d1d5db;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td {
+      background-color: #f0f4ff;
+    }
+    tr:hover td {
+      background-color: #dbeafe;
+    }
+
+    /* ── Callout boxes ── */
+    .callout {
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 10.5pt;
+    }
+    .callout-blue {
+      background: #eff6ff;
+      border-left: 4px solid #2563eb;
+      color: #1e3a8a;
+    }
+    .callout-green {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+      color: #14532d;
+    }
+    .callout-amber {
+      background: #fffbeb;
+      border-left: 4px solid #d97706;
+      color: #78350f;
+    }
+    .callout-gray {
+      background: #f8fafc;
+      border-left: 4px solid #64748b;
+      color: #334155;
+    }
+
+    /* ── Code blocks ── */
+    pre, code {
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 9.5pt;
+    }
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-radius: 6px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 12px 0;
+      line-height: 1.5;
+    }
+    code {
+      background: #f1f5f9;
+      color: #be185d;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+    pre code {
+      background: none;
+      color: #e2e8f0;
+      padding: 0;
+    }
+
+    /* ── Report section cards ── */
+    .report-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+    .report-card-header {
+      background: #1a3a6b;
+      color: #ffffff;
+      padding: 12px 18px;
+      font-size: 12pt;
+      font-weight: 700;
+    }
+    .report-card-header .route {
+      font-size: 9pt;
+      color: #93c5fd;
+      font-weight: 400;
+      margin-left: 10px;
+      font-family: 'Courier New', monospace;
+    }
+    .report-card-body {
+      padding: 16px 18px;
+      background: #ffffff;
+    }
+    .report-card-body p {
+      margin: 0 0 10px 0;
+    }
+
+    /* ── KPI chips ── */
+    .kpi-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .kpi-chip {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #93c5fd;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 9.5pt;
+      font-weight: 600;
+    }
+    .kpi-chip.green {
+      background: #dcfce7;
+      color: #15803d;
+      border-color: #86efac;
+    }
+    .kpi-chip.amber {
+      background: #fef3c7;
+      color: #92400e;
+      border-color: #fcd34d;
+    }
+    .kpi-chip.red {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: #fca5a5;
+    }
+
+    /* ── Section divider ── */
+    .section-divider {
+      border: none;
+      border-top: 2px solid #e2e8f0;
+      margin: 40px 0 30px 0;
+    }
+
+    /* ── TOC ── */
+    .toc {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0 40px 0;
+    }
+    .toc h2 {
+      margin-top: 0;
+      border-left: none;
+      padding-left: 0;
+      font-size: 13pt;
+    }
+    .toc ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .toc li {
+      margin: 6px 0;
+      font-size: 10.5pt;
+    }
+    .toc a {
+      color: #1d4ed8;
+      text-decoration: none;
+    }
+
+    /* ── Misc ── */
+    p { margin: 0 0 10px 0; line-height: 1.6; }
+    ul, ol { padding-left: 22px; margin: 8px 0 14px 0; }
+    li { margin-bottom: 5px; line-height: 1.6; }
+    strong { color: #0f2044; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 9pt;
+      font-weight: 600;
+    }
+    .badge-blue  { background: #dbeafe; color: #1e40af; }
+    .badge-green { background: #dcfce7; color: #15803d; }
+    .badge-red   { background: #fee2e2; color: #991b1b; }
+    .badge-amber { background: #fef3c7; color: #92400e; }
+    .two-col { display: flex; gap: 24px; }
+    .two-col > div { flex: 1; }
+    @media print {
+      .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ COVER ═══ -->
+<div class="cover">
+  <h1>Airport Operations Dashboard</h1>
+  <p class="subtitle">Technical Documentation &amp; Developer Reference</p>
+  <div class="meta-row">
+    <div class="meta-item"><strong>Version</strong>1.0.0</div>
+    <div class="meta-item"><strong>Date</strong>March 2026</div>
+    <div class="meta-item"><strong>Platform</strong>Azure Container Apps</div>
+    <div class="meta-item"><strong>Stack</strong>React 18 · Node.js · Azure SQL</div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ═══════════════════════════════════════════════════ TABLE OF CONTENTS ═══ -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#exec-summary">Executive Summary</a></li>
+    <li><a href="#system-overview">System Overview and Purpose</a></li>
+    <li><a href="#tech-stack">Technology Stack</a></li>
+    <li><a href="#architecture">Architecture Overview</a></li>
+    <li><a href="#auth">Authentication &amp; Multi-Tenancy</a></li>
+    <li><a href="#data-model">Data Model</a></li>
+    <li><a href="#field-config">Field Configuration System</a></li>
+    <li><a href="#reports">Report Details</a>
+      <ol type="a">
+        <li>OTP Scorecard</li>
+        <li>Delay Analysis</li>
+        <li>Airline Performance</li>
+        <li>Gate Utilization</li>
+        <li>Taxi Time</li>
+        <li>Baggage Belt</li>
+        <li>Baggage Performance</li>
+        <li>Passenger Flow</li>
+        <li>Flight Operations (Custom Reports)</li>
+      </ol>
+    </li>
+    <li><a href="#export">Export System</a></li>
+    <li><a href="#deployment">Deployment Guide</a></li>
+    <li><a href="#dev-guide">Development Guide</a></li>
+    <li><a href="#api">API Endpoints</a></li>
+  </ol>
+</div>
+
+<!-- ═══════════════════════════════════════════════ 1. EXECUTIVE SUMMARY ═══ -->
+<h1 id="exec-summary">1. Executive Summary</h1>
+
+<p>
+  The <strong>Airport Operations Dashboard</strong> is a production-ready, multi-tenant web application
+  that transforms raw APVe flight information system data into actionable operational intelligence
+  for airport management teams. It provides eight purpose-built analytical reports covering on-time
+  performance, delay root-cause analysis, gate utilization, taxi time efficiency, baggage handling,
+  and passenger flow — all accessible from a single browser-based interface with no installation required.
+</p>
+
+<div class="callout callout-blue">
+  <strong>Key Value Proposition:</strong> Each airport (site) connects to its own APVe data feed,
+  with fully configurable field mappings to accommodate different airport system configurations.
+  A single deployment serves multiple airports with complete data isolation.
+</div>
+
+<p>The system is built on modern, well-supported open-source technology and is deployed as a
+containerized application on Azure Container Apps, giving it automatic scaling, zero-downtime
+deployments, and a low operational overhead. Data is persisted in Azure SQL Database.</p>
+
+<table>
+  <thead>
+    <tr><th>Attribute</th><th>Detail</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Application Type</strong></td><td>Single-Page Application (SPA) with REST API backend</td></tr>
+    <tr><td><strong>Hosting</strong></td><td>Azure Container Apps (serverless containers)</td></tr>
+    <tr><td><strong>Database</strong></td><td>Azure SQL Database (lowest-tier / serverless)</td></tr>
+    <tr><td><strong>Authentication</strong></td><td>JWT — APVe-backed credentials + bcrypt admin accounts</td></tr>
+    <tr><td><strong>Multi-tenancy</strong></td><td>Per-site data isolation via siteId scoping</td></tr>
+    <tr><td><strong>Export Formats</strong></td><td>Excel (.xlsx) and PDF</td></tr>
+  </tbody>
+</table>
+
+<hr class="section-divider" />
+
+<!-- ═══════════════════════════════════════════════ 2. SYSTEM OVERVIEW ═══ -->
+<h1 id="system-overview">2. System Overview and Purpose</h1>
+
+<p>
+  Airport operations centers rely on Flight Information Display Systems (FIDS) like APVe to track
+  real-time aircraft movements. However, these systems are optimized for live display rather than
+  analytical reporting. Supervisors and operations managers typically resort to manual exports and
+  spreadsheets to produce the performance metrics required for shift handovers, airline SLA reviews,
+  and regulatory reporting.
+</p>
+<p>
+  The Airport Operations Dashboard solves this problem by acting as an analytics layer on top of
+  the APVe API. It fetches flight movement data for a selected date range, enriches it with computed
+  fields (OTP status, delay band, time period), and presents the results through interactive charts
+  and tables — all within seconds, directly in a browser.
+</p>
+
+<h2>Key Capabilities</h2>
+<ul>
+  <li><strong>Multi-site support</strong> — One deployment serves any number of airports, each with its own login, data feed, and configuration.</li>
+  <li><strong>Configurable field mappings</strong> — Because different APVe installations use different field names, each report's data field names can be customized per site without code changes.</li>
+  <li><strong>Custom report designer</strong> — Site administrators can design and publish custom tabular/chart reports by selecting fields, filters, grouping, and aggregation rules.</li>
+  <li><strong>Excel and PDF export</strong> — Every report can be exported for offline sharing or archiving.</li>
+  <li><strong>Role-based access</strong> — App admins, site admins, and site users have distinct permission levels.</li>
+  <li><strong>Audit trail</strong> — Changes to custom reports are recorded in a structured audit log.</li>
+</ul>
+
+<hr class="section-divider" />
+
+<!-- ═══════════════════════════════════════════════ 3. TECHNOLOGY STACK ═══ -->
+<h1 id="tech-stack">3. Technology Stack</h1>
+
+<h2>Frontend Libraries</h2>
+
+<table>
+  <thead>
+    <tr><th>Library</th><th>Version</th><th>Role &amp; Rationale</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>React 18</strong></td><td>18.2</td>
+      <td>Component-based UI framework. React 18 adds automatic batching and concurrent rendering improvements for a smoother experience when multiple state updates fire simultaneously (e.g., fetching data + updating filters).</td>
+    </tr>
+    <tr>
+      <td><strong>TypeScript</strong></td><td>5.3</td>
+      <td>Adds static type checking across the entire codebase. Critical for a data-heavy application where <code>Flight</code>, <code>Site</code>, <code>SavedReport</code>, and filter types must stay consistent between components, stores, and the API.</td>
+    </tr>
+    <tr>
+      <td><strong>Vite</strong></td><td>5.1</td>
+      <td>Next-generation build tool using native ES modules. Provides near-instant hot module replacement (HMR) in development and fast, optimized production builds via Rollup. Chosen over Create React App for speed and modern defaults.</td>
+    </tr>
+    <tr>
+      <td><strong>Tailwind CSS</strong></td><td>3.4</td>
+      <td>Utility-first CSS framework. Eliminates the need for custom stylesheet files — all styling is expressed as class names co-located with markup. The JIT compiler ensures only used utility classes are shipped in production.</td>
+    </tr>
+    <tr>
+      <td><strong>Zustand</strong></td><td>4.5</td>
+      <td>Lightweight global state management. Used for three stores: <code>useSessionStore</code> (JWT tokens, user session), <code>useSiteStore</code> (site list), and <code>useReportsStore</code> (saved custom reports). Chosen over Redux for its minimal boilerplate and excellent TypeScript ergonomics.</td>
+    </tr>
+    <tr>
+      <td><strong>Recharts</strong></td><td>2.12</td>
+      <td>Composable charting library built on D3. Used throughout for bar charts, line charts, area charts, pie/donut charts, and scatter plots. Its declarative React API allows charts to be composed from sub-components, making them straightforward to extend.</td>
+    </tr>
+    <tr>
+      <td><strong>date-fns</strong></td><td>3.3</td>
+      <td>Modular date utility library. Used for date arithmetic (<code>subDays</code>, <code>addDays</code>), time difference calculations (<code>differenceInMinutes</code>), ISO parsing (<code>parseISO</code>), and formatting. Tree-shakeable — only imported functions are bundled.</td>
+    </tr>
+    <tr>
+      <td><strong>lucide-react</strong></td><td>0.344</td>
+      <td>SVG icon library with a consistent design language. Used for all UI icons (navigation, status indicators, action buttons). Icons are React components, making them easy to size and color with Tailwind classes.</td>
+    </tr>
+    <tr>
+      <td><strong>react-router-dom</strong></td><td>6.22</td>
+      <td>Client-side routing. Implements the SPA navigation model with <code>BrowserRouter</code>, <code>Routes</code>, and <code>Route</code>. <code>ProtectedRoute</code> and <code>AdminRoute</code> wrapper components enforce authentication and authorization at the route level.</td>
+    </tr>
+    <tr>
+      <td><strong>react-hot-toast</strong></td><td>2.4</td>
+      <td>Toast notification system. Provides success/error feedback for user actions (login, export, settings save) without blocking the UI.</td>
+    </tr>
+    <tr>
+      <td><strong>axios</strong></td><td>1.6</td>
+      <td>HTTP client for API calls. Provides request/response interceptors, which are used to automatically attach JWT Authorization headers to every request.</td>
+    </tr>
+    <tr>
+      <td><strong>xlsx</strong></td><td>0.18</td>
+      <td>Library for generating Excel workbooks client-side. Used by <code>ExportMenu</code> to produce <code>.xlsx</code> files from report table data without a server round-trip.</td>
+    </tr>
+    <tr>
+      <td><strong>jspdf + jspdf-autotable</strong></td><td>4.2 / 5.0</td>
+      <td>PDF generation library with table layout support. Used to export reports as formatted PDF documents, complete with headers, column widths, and pagination.</td>
+    </tr>
+    <tr>
+      <td><strong>react-datepicker</strong></td><td>6.2</td>
+      <td>Date range picker component used in the <code>FilterBar</code> to allow users to select start and end dates for report data.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Backend &amp; Infrastructure</h2>
+
+<table>
+  <thead>
+    <tr><th>Technology</th><th>Role</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>Node.js 20 / Express</strong></td><td>REST API server. Handles authentication, site/report CRUD, APVe proxy, and serves the compiled frontend in production.</td></tr>
+    <tr><td><strong>Azure SQL Database</strong></td><td>Relational persistence for sites, app admins, field definitions, saved reports, and audit log entries. Lowest-tier serverless plan for cost efficiency.</td></tr>
+    <tr><td><strong>Docker (multi-stage)</strong></td><td>Single Dockerfile builds both frontend (Vite) and backend (TypeScript compilation), then assembles a minimal production image (~250 MB).</td></tr>
+    <tr><td><strong>Azure Container Registry</strong></td><td>Private Docker image registry. Images are built and pushed via <code>az acr build</code>.</td></tr>
+    <tr><td><strong>Azure Container Apps</strong></td><td>Serverless container hosting platform. Provides auto-scaling, managed TLS certificates, custom domains, and revision-based deployments.</td></tr>
+  </tbody>
+</table>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════ 4. ARCHITECTURE ═══ -->
+<h1 id="architecture">4. Architecture Overview</h1>
+
+<h2>System Diagram</h2>
+
+<pre>
+┌─────────────────────────────────────────────────────────────┐
+│                    Browser (React SPA)                       │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐  │
+│  │  Zustand │  │ Recharts │  │react-    │  │   Export   │  │
+│  │  Stores  │  │  Charts  │  │ router   │  │xlsx / jsPDF│  │
+│  └──────────┘  └──────────┘  └──────────┘  └────────────┘  │
+└────────────────────────┬────────────────────────────────────┘
+                         │ HTTP/JSON  (same origin in prod)
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│               Express API  (port 8080 in prod)               │
+│  /api/auth     /api/sites     /api/reports                   │
+│  /api/admins   /api/sites/:id/fields    /api/proxy           │
+│                         │                                    │
+│              Static file serving (/dist)                     │
+└───────────────┬─────────────────────────────────────────────┘
+                │                     │
+                ▼                     ▼
+      ┌──────────────────┐   ┌─────────────────────┐
+      │   Azure SQL DB   │   │   APVe Flight API    │
+      │  (sites, reports │   │  (per-site base URL, │
+      │   admins, audit) │   │   external service)  │
+      └──────────────────┘   └─────────────────────┘
+</pre>
+
+<h2>Frontend SPA</h2>
+<p>
+  The React application is a fully client-side SPA. All routing is handled by <code>react-router-dom</code> in the browser. On first load, the application initializes three Zustand stores:
+</p>
+<ol>
+  <li><code>useSiteStore</code> — fetches the list of configured sites from <code>GET /api/sites</code>.</li>
+  <li><code>useSessionStore</code> — restores any persisted JWT session from <code>sessionStorage</code>.</li>
+  <li><code>useReportsStore</code> — fetches saved custom reports (only after a valid token is available).</li>
+</ol>
+<p>
+  The initialization order is carefully sequenced to prevent a 401 error on the reports endpoint before
+  the site token exchange completes. If no session exists, the router redirects to <code>/login</code>.
+</p>
+
+<h2>Express API Backend</h2>
+<p>
+  The Express server is the single backend process. In production, it simultaneously:
+</p>
+<ul>
+  <li>Serves the compiled React SPA as static files from <code>/dist</code>.</li>
+  <li>Handles all <code>/api/*</code> routes (auth, CRUD, proxy).</li>
+  <li>Proxies all external APVe API calls through <code>/api/proxy</code> to avoid browser CORS restrictions.</li>
+</ul>
+<p>
+  On startup, <code>runMigrations()</code> is called to ensure all required Azure SQL tables exist.
+  <code>gzip</code> compression is enabled via the <code>compression</code> middleware.
+</p>
+
+<h2>APVe Proxy</h2>
+<p>
+  The <code>/api/proxy</code> route acts as a transparent passthrough to the external APVe flight
+  information API. Requests include the raw body bytes (<code>express.raw</code> middleware, registered
+  before <code>express.json</code>) to ensure binary-safe forwarding without re-serialization.
+  This is important for APVe endpoints that expect a bare JSON string (e.g., a UUID API key) rather
+  than a JSON object.
+</p>
+
+<h2>Database Initialization</h2>
+<p>
+  The API uses a migration runner (<code>runMigrations()</code> in <code>api/src/db.ts</code>) that
+  executes SQL scripts in order on every startup. Migrations are idempotent (<code>IF NOT EXISTS</code>
+  guards), so restarts are always safe.
+</p>
+
+<hr class="section-divider" />
+
+<!-- ═══════════════════════════════════════════ 5. AUTH & MULTI-TENANCY ═══ -->
+<h1 id="auth">5. Authentication &amp; Multi-Tenancy</h1>
+
+<h2>Authentication Flow</h2>
+
+<p>The application supports two distinct authentication paths:</p>
+
+<h3>Path A — Site User Login</h3>
+<ol>
+  <li>User submits IATA code, username, and password on the login page.</li>
+  <li>The API looks up the site record in Azure SQL to get the APVe <code>baseUrl</code>.</li>
+  <li>The API calls the APVe auth endpoint to obtain an <code>accessToken</code> and <code>publicAccessToken</code>.</li>
+  <li>The API signs a <strong>site JWT</strong> containing the site object, token data, user roles, and expiry. This JWT is returned to the browser.</li>
+  <li>The browser stores the JWT in <code>sessionStorage</code> and attaches it to all subsequent API requests as <code>Authorization: Bearer &lt;token&gt;</code>.</li>
+  <li>When the APVe <code>publicAccessToken</code> nears expiry, the client uses the stored <code>apiKey</code> to silently refresh it without requiring re-login.</li>
+</ol>
+
+<h3>Path B — App Admin Login</h3>
+<ol>
+  <li>User submits username and password on the login page (with Admin toggle).</li>
+  <li>The API checks the <code>app_admins</code> Azure SQL table and validates the bcrypt-hashed password.</li>
+  <li>A <strong>admin JWT</strong> is signed, granting <code>isAppAdmin: true</code> and <code>isGlobalAdmin: true</code>.</li>
+  <li>The admin can then select any site to act as and switch between sites from the admin panel.</li>
+</ol>
+
+<h2>JWT Contents</h2>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>username</code></td><td>string</td><td>Login username</td></tr>
+    <tr><td><code>site</code></td><td>Site | null</td><td>Current site object (null for app admins until a site is selected)</td></tr>
+    <tr><td><code>accessToken</code></td><td>string</td><td>APVe session token</td></tr>
+    <tr><td><code>publicAccessToken</code></td><td>string</td><td>APVe public token (used for flight data calls)</td></tr>
+    <tr><td><code>tokenExpiry</code></td><td>number</td><td>Unix timestamp of APVe token expiry</td></tr>
+    <tr><td><code>isGlobalAdmin</code></td><td>boolean</td><td>Can access all sites</td></tr>
+    <tr><td><code>isSiteAdmin</code></td><td>boolean</td><td>Can manage site's field definitions and reports</td></tr>
+    <tr><td><code>isAppAdmin</code></td><td>boolean</td><td>Application-level admin (bcrypt account in Azure SQL)</td></tr>
+    <tr><td><code>adminActiveSiteId</code></td><td>string | null</td><td>Which site an app admin is currently viewing</td></tr>
+  </tbody>
+</table>
+
+<h2>Multi-Tenancy Model</h2>
+
+<div class="callout callout-blue">
+  <strong>Isolation Guarantee:</strong> Each site's data is fetched directly from that site's own
+  APVe instance using that site's credentials. No site can ever access another site's flight data.
+</div>
+
+<p>Multi-tenancy is enforced at multiple layers:</p>
+<ul>
+  <li><strong>API layer</strong> — The site JWT encodes which <code>siteId</code> the user belongs to. All API queries for field definitions and reports are scoped with <code>WHERE site_id = ?</code>.</li>
+  <li><strong>Proxy layer</strong> — Flight data is fetched using the APVe <code>baseUrl</code> and tokens from the site's own session — there is no shared credentials pool.</li>
+  <li><strong>Custom reports</strong> — Each <code>SavedReport</code> has a <code>siteId</code> owner field. App admin template reports (<code>siteId = null</code>) can be cloned to specific sites.</li>
+  <li><strong>Field configurations</strong> — Stored in <code>localStorage</code> under a site-namespaced key, so different users of the same browser each get the correct site's configuration.</li>
+  <li><strong>Audit log</strong> — Every change to a report is recorded with <code>siteId</code>, <code>changedBy</code>, and a timestamp.</li>
+</ul>
+
+<h2>Role Summary</h2>
+<table>
+  <thead><tr><th>Role</th><th>Login Method</th><th>Permissions</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="badge badge-red">App Admin</span></td>
+      <td>bcrypt account in Azure SQL</td>
+      <td>Full: manage sites, app admins, all reports; switch between sites; create template reports</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-blue">Site Admin</span></td>
+      <td>APVe credentials (with admin flag)</td>
+      <td>Manage own site's field definitions, reports, and user access; activate/deactivate reports</td>
+    </tr>
+    <tr>
+      <td><span class="badge badge-green">Site User</span></td>
+      <td>APVe credentials</td>
+      <td>View active reports for their site; export data; adjust date range and filters</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════ 6. DATA MODEL ═══ -->
+<h1 id="data-model">6. Data Model</h1>
+
+<h2>Flight Object</h2>
+
+<p>
+  The central data entity is the <code>Flight</code> interface. Flight records are fetched from the
+  APVe API via the server-side proxy and enriched with computed fields before being displayed in reports.
+</p>
+
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Source</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>adi</code></td><td>'A' | 'D'</td><td>APVe</td><td>Arrival or Departure indicator</td></tr>
+    <tr><td><code>scheduleDate</code></td><td>string</td><td>APVe</td><td>Scheduled date (MM/dd/yyyy)</td></tr>
+    <tr><td><code>linecode</code></td><td>string</td><td>APVe</td><td>IATA airline code (e.g., AA, UA)</td></tr>
+    <tr><td><code>number</code></td><td>string</td><td>APVe</td><td>Flight number (e.g., 1234)</td></tr>
+    <tr><td><code>siteIata</code></td><td>string</td><td>APVe</td><td>Airport IATA code</td></tr>
+    <tr><td><code>gate</code></td><td>string</td><td>APVe</td><td>Gate or stand assignment</td></tr>
+    <tr><td><code>city</code></td><td>string</td><td>APVe</td><td>Origin or destination city</td></tr>
+    <tr><td><code>schedule</code></td><td>string</td><td>APVe</td><td>Scheduled datetime (MM/dd/yyyy HH:mm)</td></tr>
+    <tr><td><code>actual</code></td><td>string</td><td>APVe</td><td>Estimated/actual datetime</td></tr>
+    <tr><td><code>status</code></td><td>string</td><td>APVe</td><td>Raw status string from FIDS</td></tr>
+    <tr><td><code>claim</code></td><td>string</td><td>APVe</td><td>Baggage carousel/claim assignment</td></tr>
+    <tr><td><code>delayMinutes</code></td><td>number</td><td>APVe</td><td>Delay in minutes (negative = early)</td></tr>
+    <tr><td><code>parkingbay</code></td><td>string</td><td>APVe</td><td>Aircraft stand/parking bay</td></tr>
+    <tr><td><code>terminal</code></td><td>string</td><td>APVe</td><td>Terminal identifier</td></tr>
+    <tr><td><code>line</code></td><td>string</td><td>APVe</td><td>Full airline name from FIDS</td></tr>
+    <tr><td><code>remark</code></td><td>string</td><td>APVe</td><td>Free-text status remark</td></tr>
+    <tr><td><code>otpStatus</code></td><td>OtpStatus</td><td>Computed</td><td>'On Time' | 'Delayed' | 'Cancelled' | 'Early'</td></tr>
+    <tr><td><code>delayBand</code></td><td>DelayBand</td><td>Computed</td><td>Bucketed delay range (e.g., '16-30 min')</td></tr>
+    <tr><td><code>scheduledHour</code></td><td>number</td><td>Computed</td><td>Hour of scheduled time (0–23)</td></tr>
+    <tr><td><code>timePeriod</code></td><td>TimePeriod</td><td>Computed</td><td>Grouped time of day ('Morning (6-12)', etc.)</td></tr>
+    <tr><td><code>airlineName</code></td><td>string</td><td>Computed</td><td>Resolved full airline name</td></tr>
+    <tr><td><code>flightKey</code></td><td>string</td><td>Computed</td><td>Unique composite key (linecode + number + scheduleDate)</td></tr>
+    <tr><td><code>[key: string]</code></td><td>unknown</td><td>Dynamic</td><td>Index signature allows site-specific custom fields</td></tr>
+  </tbody>
+</table>
+
+<h2>OTP Status Logic</h2>
+<table>
+  <thead><tr><th>Condition</th><th>OTP Status</th><th>Delay Band</th></tr></thead>
+  <tbody>
+    <tr><td>Status contains 'Cancelled'</td><td><span class="badge badge-red">Cancelled</span></td><td>Cancelled</td></tr>
+    <tr><td>delayMinutes &lt; 0</td><td><span class="badge badge-blue">Early</span></td><td>On Time</td></tr>
+    <tr><td>delayMinutes &le; 15</td><td><span class="badge badge-green">On Time</span></td><td>On Time</td></tr>
+    <tr><td>delayMinutes 16–30</td><td><span class="badge badge-amber">Delayed</span></td><td>16-30 min</td></tr>
+    <tr><td>delayMinutes 31–60</td><td><span class="badge badge-amber">Delayed</span></td><td>31-60 min</td></tr>
+    <tr><td>delayMinutes 61–120</td><td><span class="badge badge-amber">Delayed</span></td><td>61-120 min</td></tr>
+    <tr><td>delayMinutes &gt; 120</td><td><span class="badge badge-red">Delayed</span></td><td>120+ min</td></tr>
+  </tbody>
+</table>
+
+<h2>Site Object</h2>
+<table>
+  <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>string</td><td>Internal UUID</td></tr>
+    <tr><td><code>name</code></td><td>string</td><td>Full airport name</td></tr>
+    <tr><td><code>iataCode</code></td><td>string</td><td>3-letter IATA airport code</td></tr>
+    <tr><td><code>siteId</code></td><td>string</td><td>APVe site identifier</td></tr>
+    <tr><td><code>baseUrl</code></td><td>string</td><td>APVe API base URL for this airport</td></tr>
+    <tr><td><code>adminUsers</code></td><td>string[]</td><td>APVe usernames with admin rights</td></tr>
+    <tr><td><code>enabled</code></td><td>boolean</td><td>Whether the site is active in the dashboard</td></tr>
+    <tr><td><code>serviceApiKey</code></td><td>string?</td><td>Optional UUID; bypasses 3-step APVe auth flow</td></tr>
+    <tr><td><code>fetchTimeoutSeconds</code></td><td>number?</td><td>Timeout for APVe data requests (default 60s)</td></tr>
+  </tbody>
+</table>
+
+<h2>SavedReport Object</h2>
+<p>Custom reports created in the Report Designer are persisted in Azure SQL with the following schema:</p>
+<table>
+  <thead><tr><th>Field</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>id</code></td><td>UUID primary key</td></tr>
+    <tr><td><code>siteId</code></td><td>Owning site (null = app admin template)</td></tr>
+    <tr><td><code>name</code></td><td>Display name</td></tr>
+    <tr><td><code>isActive</code></td><td>Site admins can hide reports from regular users</td></tr>
+    <tr><td><code>parentReportId</code></td><td>Set when cloned from a template — tracks lineage</td></tr>
+    <tr><td><code>isBaseReport</code></td><td>True for app admin templates</td></tr>
+    <tr><td><code>fields</code></td><td>Ordered array of field IDs to display as columns</td></tr>
+    <tr><td><code>chartType</code></td><td>'table' | 'bar' | 'pie' | 'line'</td></tr>
+    <tr><td><code>groupBy / aggregation</code></td><td>Group field and aggregation function (count, avgDelay)</td></tr>
+    <tr><td><code>fieldExpressions</code></td><td>Computed column expressions (timeDiff, concat, lookup, static)</td></tr>
+    <tr><td><code>visibleFilters</code></td><td>Which filter controls are shown to viewers</td></tr>
+    <tr><td><code>sortConfig</code></td><td>Default sort columns and directions</td></tr>
+    <tr><td><code>columnLabels</code></td><td>Custom header label overrides per column</td></tr>
+    <tr><td><code>fieldColorRules</code></td><td>Conditional cell formatting rules per column</td></tr>
+    <tr><td><code>defaultFilterValues</code></td><td>Pre-applied filter values when report first opens</td></tr>
+  </tbody>
+</table>
+
+<hr class="section-divider" />
+
+<!-- ═══════════════════════════════════════════ 7. FIELD CONFIG SYSTEM ═══ -->
+<h1 id="field-config">7. Field Configuration System</h1>
+
+<p>
+  Different APVe installations use different field names for the same concepts. For example,
+  the "actual landing time" field might be called <code>actualtime</code> at one airport and
+  <code>actual_arr</code> at another. The Field Configuration System solves this without any
+  code changes or redeployment.
+</p>
+
+<h2>How It Works</h2>
+<ol>
+  <li>
+    <strong>Defaults are defined in code.</strong> Each report that uses non-standard fields
+    declares a <code>DEFAULTS</code> constant with sensible starting field names (e.g.,
+    <code>landingField: 'actualtime'</code>).
+  </li>
+  <li>
+    <strong>A settings panel is exposed in the UI.</strong> A gear icon opens a collapsible
+    panel with labeled text inputs for each configurable field name.
+  </li>
+  <li>
+    <strong>The user edits and clicks Apply.</strong> The component maintains a <code>draft</code>
+    state (live input values) and an applied <code>cfg</code> state. Clicking <strong>Apply</strong>
+    copies the draft into <code>cfg</code>, which triggers a <code>useMemo</code> recalculation
+    of report data — no page reload needed.
+  </li>
+  <li>
+    <strong>Persistence via localStorage.</strong> Applied configurations are saved to
+    <code>localStorage</code> under a key namespaced to the current site ID, e.g.,
+    <code>taxitime-cfg-{siteId}</code>. On page revisit, the saved config is restored from
+    localStorage automatically.
+  </li>
+</ol>
+
+<div class="callout callout-amber">
+  <strong>Important:</strong> Field configuration values are the raw field names as they appear
+  in the APVe JSON response. If the field does not exist in the data, the report will show empty
+  values rather than an error. Users can verify correct field names by checking the Flight
+  Operations raw data table.
+</div>
+
+<h2>Built-in vs. Custom Fields</h2>
+<p>The system distinguishes between two categories of fields:</p>
+
+<table>
+  <thead><tr><th>Category</th><th>Storage</th><th>Examples</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Built-in fields</strong></td>
+      <td>Defined in <code>DEFAULT_FIELD_DEFINITIONS</code> in <code>types/index.ts</code></td>
+      <td>linecode, number, adi, gate, schedule, actual, status, delayMinutes, claim, scheduleDate</td>
+    </tr>
+    <tr>
+      <td><strong>Site field definitions</strong></td>
+      <td>Azure SQL <code>field_definitions</code> table, scoped by <code>site_id</code></td>
+      <td>Custom fields created per-site, may include computed expressions (timeDiff, concat, lookup)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Conditional Formatting (Color Rules)</h2>
+<p>
+  Both built-in and custom fields support <strong>color rules</strong> — conditional formatting
+  that applies text color, background color, and bold styling to table cells based on the cell value.
+  Rules are evaluated in order; the first matching rule wins.
+</p>
+<p>Built-in color rules example (from <code>status</code> field):</p>
+<ul>
+  <li><span class="badge badge-green">On Time</span> → green text on green background</li>
+  <li><span class="badge badge-amber">Delayed</span> → amber text on amber background (bold)</li>
+  <li><span class="badge badge-red">Cancelled</span> → red text on red background (bold)</li>
+  <li><span class="badge badge-blue">Early</span> → blue text on blue background</li>
+</ul>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════ 8. REPORT DETAILS ═══ -->
+<h1 id="reports">8. Report Details</h1>
+
+<!-- OTP Scorecard -->
+<div class="report-card">
+  <div class="report-card-header">
+    OTP Scorecard
+    <span class="route">/reports/otp-scorecard</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Ranks every operating airline at the site by On-Time Performance percentage for the selected date range. Provides an at-a-glance view of which carriers are meeting punctuality standards and which are dragging down overall airport OTP. Used in airline SLA reviews and regulatory reporting.</p>
+
+    <h4>Key Metrics / KPIs</h4>
+    <div class="kpi-row">
+      <span class="kpi-chip green">Best Performer (OTP%)</span>
+      <span class="kpi-chip red">Worst Performer (OTP%)</span>
+      <span class="kpi-chip">Avg Airport OTP%</span>
+      <span class="kpi-chip amber">% Flights Delayed</span>
+    </div>
+
+    <h4>OTP Thresholds</h4>
+    <table>
+      <thead><tr><th>Label</th><th>Threshold</th><th>Indicator Color</th></tr></thead>
+      <tbody>
+        <tr><td>Excellent</td><td>&ge; 90%</td><td>Green (#22c55e)</td></tr>
+        <tr><td>Good</td><td>&ge; 80%</td><td>Lime (#84cc16)</td></tr>
+        <tr><td>Fair</td><td>&ge; 65%</td><td>Amber (#f59e0b)</td></tr>
+        <tr><td>Poor</td><td>&lt; 65%</td><td>Red (#ef4444)</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>Ranked table</strong> — Airlines sorted by OTP%, with rank badges (gold/silver/bronze for top 3), flight count, and OTP label badge.</li>
+      <li><strong>Horizontal bar chart</strong> — OTP% per airline, bars colored by performance tier.</li>
+      <li><strong>Scatter plot</strong> — OTP% (Y-axis) vs. number of flights (X-axis), with bubble size = flight volume. Reveals high-volume airlines with poor OTP.</li>
+    </ul>
+
+    <h4>Configurable Fields</h4>
+    <p>None — uses standard built-in fields (linecode, otpStatus, delayMinutes).</p>
+
+    <h4>Export</h4>
+    <p>Excel and PDF via the ExportMenu component (top-right of page).</p>
+
+    <h4>Data Computation</h4>
+    <p>Groups all filtered flights by <code>linecode</code>. For each airline, counts on-time, delayed, and cancelled flights and computes <code>onTimePercent = (onTime / total) * 100</code>. Airlines are then sorted descending by OTP%.</p>
+  </div>
+</div>
+
+<!-- Delay Analysis -->
+<div class="report-card">
+  <div class="report-card-header">
+    Delay Analysis
+    <span class="route">/reports/delay-analysis</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Provides a detailed breakdown of delays across the entire flight schedule for the selected date range. Helps operations managers identify systemic delay patterns, peak delay hours, and the most chronically delayed individual flights. Used for root-cause investigation and shift debriefs.</p>
+
+    <h4>Key Metrics / KPIs</h4>
+    <div class="kpi-row">
+      <span class="kpi-chip amber">Total Delayed Flights</span>
+      <span class="kpi-chip">Avg Delay (mins)</span>
+      <span class="kpi-chip red">Cancellation Rate %</span>
+      <span class="kpi-chip">Max Delay (mins)</span>
+    </div>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>Status distribution pie chart</strong> — Proportions of On Time, Early, Delayed, Cancelled.</li>
+      <li><strong>Delay band bar chart</strong> — Number of flights in each delay bucket (1-15, 16-30, 31-60, 61-120, 120+).</li>
+      <li><strong>Delay by hour bar chart</strong> — Average delay minutes by scheduled hour (0–23). Identifies peak delay periods.</li>
+      <li><strong>Most delayed flights table</strong> — Ranked list of the most delayed individual flights with airline, route, scheduled time, actual time, and delay minutes.</li>
+    </ul>
+
+    <h4>Configurable Fields</h4>
+    <p>The <strong>actual time field name</strong> is configurable (default: <code>actual</code>). This allows airports where the estimated time is stored in a different field to still produce accurate delay calculations.</p>
+
+    <h4>Filters</h4>
+    <p>Arrival/Departure toggle, airline multi-select, status multi-select, date range picker.</p>
+  </div>
+</div>
+
+<!-- Airline Performance -->
+<div class="report-card">
+  <div class="report-card-header">
+    Airline Performance
+    <span class="route">/reports/airline-performance</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Provides a comprehensive per-airline operational statistics summary, comparing all carriers on a common set of KPIs. Unlike OTP Scorecard (which focuses on ranking), this report gives the full picture including absolute counts, average delay, and cancellation numbers. Used in airline partnership reviews and slot coordination.</p>
+
+    <h4>Key Metrics / KPIs</h4>
+    <div class="kpi-row">
+      <span class="kpi-chip">Total Flights / Airline</span>
+      <span class="kpi-chip green">On-Time Count</span>
+      <span class="kpi-chip amber">Delayed Count</span>
+      <span class="kpi-chip red">Cancelled Count</span>
+      <span class="kpi-chip">Avg Delay (mins)</span>
+      <span class="kpi-chip">OTP %</span>
+    </div>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>Grouped bar chart</strong> — Side-by-side on-time, delayed, and cancelled bars for each airline.</li>
+      <li><strong>Summary stats table</strong> — Full AirlineStats table with all KPIs, sortable columns.</li>
+      <li><strong>Airport-wide KPI cards</strong> — Aggregate totals across all airlines.</li>
+    </ul>
+
+    <h4>Data Computation</h4>
+    <p>Uses the <code>AirlineStats</code> interface. Iterates all filtered flights, groups by <code>linecode</code>, and accumulates counts and delay totals. Average delay is computed only for delayed flights (<code>avgDelay = totalDelayMins / delayedCount</code>).</p>
+  </div>
+</div>
+
+<!-- Gate Utilization -->
+<div class="report-card">
+  <div class="report-card-header">
+    Gate Utilization
+    <span class="route">/reports/gate-utilization</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Analyzes how effectively each gate/stand is being used throughout the selected period. High occupancy indicates a productive gate; consistently low occupancy may suggest a gate can be closed for maintenance or reassigned. Used in gate allocation planning and capacity analysis.</p>
+
+    <h4>Key Metrics / KPIs</h4>
+    <div class="kpi-row">
+      <span class="kpi-chip">Active Gates</span>
+      <span class="kpi-chip">Total Movements / Gate</span>
+      <span class="kpi-chip">Avg Occupancy Time (mins)</span>
+      <span class="kpi-chip">Arrivals / Departures per Gate</span>
+    </div>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>Gantt-style bar chart</strong> — Gate occupancy blocks plotted by start hour and duration for each gate, color-coded by arrival/departure.</li>
+      <li><strong>Occupancy by concourse</strong> — Aggregated occupancy grouped by concourse letter (extracted from gate name prefix, e.g., "A" from "A12").</li>
+      <li><strong>Gate utilization table</strong> — Ranked by total movements; includes avg occupancy time in minutes.</li>
+    </ul>
+
+    <h4>Avg Occupancy Formula</h4>
+    <p>For paired arrival/departure turns at the same gate: <code>occupancy = differenceInMinutes(depActual, arrActual)</code>. Gates without matching pairs are counted by flight volume only.</p>
+
+    <h4>Configurable Fields</h4>
+    <table>
+      <thead><tr><th>Config Key</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>arrGateField</td><td>gate</td><td>Field containing arrival gate identifier</td></tr>
+        <tr><td>depGateField</td><td>gate</td><td>Field containing departure gate identifier</td></tr>
+        <tr><td>arrActualField</td><td>actual</td><td>Arrival actual time field</td></tr>
+        <tr><td>depActualField</td><td>actual</td><td>Departure actual time field</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Filters</h4>
+    <p>Date range, airline, concourse filter (free text prefix match on gate name).</p>
+  </div>
+</div>
+
+<!-- Taxi Time -->
+<div class="report-card">
+  <div class="report-card-header">
+    Taxi Time
+    <span class="route">/reports/taxi-time</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Measures ground movement efficiency — the time aircraft spend taxiing between the runway and the gate. Long taxi times consume fuel, delay passengers, and affect turnaround schedules. This report helps operations identify systemic issues (runway configuration, gate distances, ATC instructions) and track SLA compliance.</p>
+
+    <h4>Key Metrics / KPIs</h4>
+    <div class="kpi-row">
+      <span class="kpi-chip">Avg Taxi-In (mins)</span>
+      <span class="kpi-chip">Avg Taxi-Out (mins)</span>
+      <span class="kpi-chip amber">Taxi-In SLA Breaches (&gt;15 min)</span>
+      <span class="kpi-chip amber">Taxi-Out SLA Breaches (&gt;20 min)</span>
+      <span class="kpi-chip">% Within SLA</span>
+    </div>
+
+    <h4>SLA Benchmarks</h4>
+    <table>
+      <thead><tr><th>Metric</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Taxi-In (landing → on-chocks)</td><td>≤ 15 minutes</td></tr>
+        <tr><td>Taxi-Out (off-block → takeoff)</td><td>≤ 20 minutes</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>Avg taxi time bar chart by airline</strong> — Separate bars for taxi-in and taxi-out per carrier.</li>
+      <li><strong>Hourly trend line chart</strong> — Taxi-in and taxi-out averages plotted by hour of day to identify peak congestion windows.</li>
+      <li><strong>Scatter plot</strong> — Individual flight taxi times plotted to show distribution and outliers.</li>
+      <li><strong>Detailed table</strong> — Per-flight taxi-in and taxi-out values with color coding (green/amber/red based on SLA).</li>
+    </ul>
+
+    <h4>Configurable Fields</h4>
+    <table>
+      <thead><tr><th>Config Key</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>landingField</td><td>actualtime</td><td>Arrival: actual touchdown time</td></tr>
+        <tr><td>onChocksField</td><td>onchk</td><td>Arrival: time wheels stop at gate</td></tr>
+        <tr><td>arrGateField</td><td>gate</td><td>Arrival: gate/stand identifier</td></tr>
+        <tr><td>offBlockField</td><td>ofchk</td><td>Departure: time aircraft starts moving</td></tr>
+        <tr><td>takeoffField</td><td>actualtime</td><td>Departure: actual wheels-off time</td></tr>
+        <tr><td>depGateField</td><td>gate</td><td>Departure: gate/stand identifier</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Data Computation</h4>
+    <p>
+      Uses <code>safeDiff(laterStr, earlierStr, maxMins=90)</code> — a helper that parses two ISO datetime strings, computes their difference in minutes, and returns <code>null</code> if the result is negative or exceeds 90 minutes (outlier rejection). This prevents bad data from skewing averages.
+    </p>
+  </div>
+</div>
+
+<!-- Baggage Belt -->
+<div class="report-card">
+  <div class="report-card-header">
+    Baggage Belt
+    <span class="route">/reports/baggage-belt</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Measures baggage handling performance at the belt/carousel level for arriving flights. Tracking time-to-first-bag and overall delivery duration is critical for passenger satisfaction scores and ground handler SLA compliance. This report gives operations supervisors real-time visibility into belt performance.</p>
+
+    <h4>SLA Benchmarks</h4>
+    <table>
+      <thead><tr><th>Metric</th><th>SLA Target</th></tr></thead>
+      <tbody>
+        <tr><td>Time to First Bag (TTFB)</td><td>≤ 20 minutes</td></tr>
+        <tr><td>Belt Active Duration</td><td>≤ 30 minutes</td></tr>
+        <tr><td>Total Delivery Time</td><td>≤ 45 minutes</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Performance Labels</h4>
+    <table>
+      <thead><tr><th>Result vs. Target</th><th>Label</th></tr></thead>
+      <tbody>
+        <tr><td>&le; 80% of target</td><td>Excellent (green)</td></tr>
+        <tr><td>&le; target</td><td>On Target (lime)</td></tr>
+        <tr><td>&le; 130% of target</td><td>At Risk (amber)</td></tr>
+        <tr><td>&gt; 130% of target</td><td>Breach (red)</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>KPI cards</strong> — Avg TTFB, Avg belt duration, SLA breach counts for each metric.</li>
+      <li><strong>Bar chart by belt</strong> — Average TTFB and duration per baggage belt/carousel.</li>
+      <li><strong>Trend line chart</strong> — Baggage delivery times by hour.</li>
+      <li><strong>Per-flight table</strong> — TTFB, duration, and total time for each arrival, color-coded by SLA status.</li>
+    </ul>
+
+    <h4>Configurable Fields</h4>
+    <table>
+      <thead><tr><th>Config Key</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>firstBagField</td><td>firstbag</td><td>Timestamp of first bag appearing on belt</td></tr>
+        <tr><td>lastBagField</td><td>lastbag</td><td>Timestamp of last bag on belt</td></tr>
+        <tr><td>beltField</td><td>belt</td><td>Belt/carousel identifier field</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Note</h4>
+    <p>This report filters to arrivals only (<code>adi = 'A'</code>) by default, as baggage delivery is an arrival-only process. The actual landing time is derived from the standard <code>actual</code> field.</p>
+  </div>
+</div>
+
+<!-- Baggage Performance -->
+<div class="report-card">
+  <div class="report-card-header">
+    Baggage Performance
+    <span class="route">/reports/baggage-performance</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Provides a per-carousel breakdown of delayed arrivals. While Baggage Belt focuses on timing metrics, this report focuses on the frequency of delays per carousel — revealing whether specific carousels are chronically underperforming or overloaded.</p>
+
+    <h4>Key Metrics / KPIs</h4>
+    <div class="kpi-row">
+      <span class="kpi-chip green">On-Time Arrivals per Carousel</span>
+      <span class="kpi-chip amber">Delayed Arrivals per Carousel</span>
+      <span class="kpi-chip">Avg Delay per Carousel (mins)</span>
+      <span class="kpi-chip red">Delay Rate %</span>
+    </div>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>Grouped bar chart</strong> — On-time vs. delayed counts stacked by carousel.</li>
+      <li><strong>Trend line</strong> — Delay frequency over time by carousel.</li>
+      <li><strong>Summary table</strong> — Per-carousel on-time count, delayed count, delay rate %, avg delay.</li>
+    </ul>
+
+    <h4>Configurable Fields</h4>
+    <p><strong>claimField</strong> (default: <code>claim</code>) — The field name that identifies which baggage carousel a flight's bags will arrive at.</p>
+
+    <h4>Note</h4>
+    <p>Arrivals only. Uses <code>otpStatus</code> computed field to classify each flight as delayed or on-time, then groups by the claim/carousel field value.</p>
+  </div>
+</div>
+
+<!-- Passenger Flow -->
+<div class="report-card">
+  <div class="report-card-header">
+    Passenger Flow
+    <span class="route">/reports/passenger-flow</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> Estimates hourly passenger volumes throughout the day, broken down by deplaning arrivals and boarding departures. Used by terminal operations teams for staffing decisions, retail activation, security lane planning, and concession management.</p>
+
+    <div class="callout callout-gray">
+      <strong>Estimation Note:</strong> Passenger counts are estimated using a configurable <em>passengers per flight</em> factor (default: 150, representing a narrow-body aircraft industry average). This report does not require actual passenger count data from the FIDS.
+    </div>
+
+    <h4>Key Metrics / KPIs</h4>
+    <div class="kpi-row">
+      <span class="kpi-chip">Total Estimated Pax (Arrivals)</span>
+      <span class="kpi-chip">Total Estimated Pax (Departures)</span>
+      <span class="kpi-chip red">Peak Hour &amp; Volume</span>
+      <span class="kpi-chip amber">Congestion Level</span>
+    </div>
+
+    <h4>Congestion Levels</h4>
+    <table>
+      <thead><tr><th>Load % (relative to peak)</th><th>Level</th><th>Color</th></tr></thead>
+      <tbody>
+        <tr><td>&lt; 30%</td><td>Low</td><td>Green</td></tr>
+        <tr><td>30–59%</td><td>Moderate</td><td>Lime</td></tr>
+        <tr><td>60–79%</td><td>High</td><td>Amber</td></tr>
+        <tr><td>&ge; 80%</td><td>Critical</td><td>Red</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Visualizations</h4>
+    <ul>
+      <li><strong>Hourly area chart</strong> — Stacked/overlaid areas for deplaning (arrivals) and boarding (departures) by hour.</li>
+      <li><strong>Concourse congestion bar chart</strong> — Estimated pax load per concourse (gate prefix extracted with regex <code>/^([A-Za-z]+)/</code>).</li>
+      <li><strong>Congestion heat map table</strong> — Each hour rated with a congestion level badge.</li>
+    </ul>
+
+    <h4>Configurable Fields</h4>
+    <p>No APVe field mappings required. The <strong>passengers per flight</strong> estimate can be adjusted in the settings panel.</p>
+  </div>
+</div>
+
+<!-- Flight Operations / Custom Reports -->
+<div class="report-card">
+  <div class="report-card-header">
+    Flight Operations &amp; Custom Reports
+    <span class="route">/reports/flight-operations &nbsp;|&nbsp; /reports/custom/:id</span>
+  </div>
+  <div class="report-card-body">
+    <p><strong>Purpose &amp; Business Value:</strong> The Flight Operations page is a configurable tabular view of all raw flight data, providing a full FIDS-like data table with filtering, sorting, and export. Custom reports (<code>/reports/custom/:id</code>) are user-designed reports created in the Report Designer.</p>
+
+    <h4>Report Designer Features</h4>
+    <ul>
+      <li>Select any combination of built-in and site-defined fields as columns</li>
+      <li>Choose chart type: table, bar chart, pie chart, or line chart</li>
+      <li>Set grouping field and aggregation (count or average delay)</li>
+      <li>Configure visible filter controls</li>
+      <li>Set default sort order and default filter values</li>
+      <li>Override column header labels</li>
+      <li>Add conditional color formatting rules per column</li>
+      <li>Write computed column expressions (time difference, field concatenation, value lookup)</li>
+    </ul>
+
+    <h4>Report Lifecycle</h4>
+    <ol>
+      <li>App admin creates a <strong>base/template report</strong> (<code>isBaseReport: true</code>, <code>siteId: null</code>).</li>
+      <li>Admin clones the template to one or more sites.</li>
+      <li>Site admins can customize the cloned report and set <code>isActive</code>.</li>
+      <li>Site users see only active reports in their navigation menu.</li>
+      <li>All changes are recorded in the audit log with before/after snapshots.</li>
+    </ol>
+  </div>
+</div>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════ 9. EXPORT SYSTEM ═══ -->
+<h1 id="export">9. Export System</h1>
+
+<p>
+  Every report in the dashboard includes an <strong>ExportMenu</strong> component (top-right corner).
+  Exports are performed entirely client-side — no server round-trip is needed after the data is loaded.
+</p>
+
+<h2>Excel Export (.xlsx)</h2>
+<ul>
+  <li>Uses the <strong>xlsx</strong> library (SheetJS).</li>
+  <li>Creates a workbook with a single worksheet named after the report.</li>
+  <li>Column headers are taken from the report's field labels or column label overrides.</li>
+  <li>All filtered, visible rows are exported (not just the current page if pagination is active).</li>
+  <li>Dates are formatted as strings matching the field's configured <code>dateFormat</code>.</li>
+  <li>File is triggered as a browser download with the report name and current date as the filename.</li>
+</ul>
+
+<h2>PDF Export</h2>
+<ul>
+  <li>Uses <strong>jsPDF</strong> + <strong>jspdf-autotable</strong>.</li>
+  <li>Generates a landscape or portrait PDF with a title header, date range, and site name.</li>
+  <li>Table cells are rendered with <code>autotable</code>, which handles column width distribution and row pagination automatically.</li>
+  <li>KPI summary cards are rendered as a header section above the table where applicable.</li>
+</ul>
+
+<div class="callout callout-blue">
+  <strong>Export Tip:</strong> For large date ranges, the Excel export is recommended over PDF.
+  PDF rendering is better suited to summary reports (OTP Scorecard, Airline Performance) where
+  the row count is manageable.
+</div>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════ 10. DEPLOYMENT ═══ -->
+<h1 id="deployment">10. Deployment Guide</h1>
+
+<h2>Docker Image Build</h2>
+<p>The project uses a <strong>multi-stage Dockerfile</strong>:</p>
+
+<table>
+  <thead><tr><th>Stage</th><th>Base Image</th><th>Output</th></tr></thead>
+  <tbody>
+    <tr><td>frontend-build</td><td>node:20-alpine</td><td>Compiled React SPA in <code>/app/dist</code></td></tr>
+    <tr><td>api-build</td><td>node:20-alpine</td><td>Compiled TypeScript API in <code>/app/api/dist</code></td></tr>
+    <tr><td>final</td><td>node:20-alpine</td><td>Combines both outputs into a minimal ~250 MB image</td></tr>
+  </tbody>
+</table>
+
+<h2>Build and Push to Azure Container Registry</h2>
+<pre><code># Build image locally
+docker build -t airport-reports:latest .
+
+# Or use ACR Tasks (recommended — runs in the cloud, no local Docker needed)
+az acr build \
+  --registry &lt;your-acr-name&gt; \
+  --image airport-reports:latest \
+  .</code></pre>
+
+<h2>Deploy to Azure Container Apps</h2>
+<pre><code># Initial creation (first deployment)
+az containerapp create \
+  --name airport-reports \
+  --resource-group &lt;resource-group&gt; \
+  --environment &lt;container-apps-environment&gt; \
+  --image &lt;your-acr-name&gt;.azurecr.io/airport-reports:latest \
+  --target-port 8080 \
+  --ingress external \
+  --env-vars \
+    SQL_CONNECTION_STRING="secretref:sql-conn" \
+    JWT_SECRET="secretref:jwt-secret" \
+    NODE_ENV=production \
+    PORT=8080
+
+# Update existing deployment
+az containerapp update \
+  --name airport-reports \
+  --resource-group &lt;resource-group&gt; \
+  --image &lt;your-acr-name&gt;.azurecr.io/airport-reports:latest</code></pre>
+
+<h2>Required Environment Variables</h2>
+<table>
+  <thead><tr><th>Variable</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td><code>SQL_CONNECTION_STRING</code></td><td>Yes</td><td>Full Azure SQL connection string. Format: <code>Server=tcp:&lt;server&gt;.database.windows.net,1433;Database=airport-reports;User ID=sqladmin;Password=&lt;pw&gt;;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;</code></td></tr>
+    <tr><td><code>JWT_SECRET</code></td><td>Yes</td><td>Random string (32+ characters) used to sign and verify JWTs. Changing this invalidates all active sessions.</td></tr>
+    <tr><td><code>NODE_ENV</code></td><td>Yes</td><td>Set to <code>production</code>. Disables CORS headers and enables static file serving.</td></tr>
+    <tr><td><code>PORT</code></td><td>Yes</td><td>HTTP port to listen on. Azure Container Apps maps the ingress to this port. Use <code>8080</code>.</td></tr>
+    <tr><td><code>VITE_API_BASE_URL</code></td><td>Dev only</td><td>Frontend-only variable. In production, API calls use the same origin (no CORS). In development, set to <code>http://localhost:3001/api</code>.</td></tr>
+  </tbody>
+</table>
+
+<h2>Azure SQL Database Setup</h2>
+<p>
+  The application handles its own schema via the migration runner. No manual table creation is required.
+  Use the <strong>Basic</strong> or <strong>Serverless General Purpose</strong> tier for low-traffic deployments.
+  The connection string must use SQL authentication (username/password) or a managed identity configuration.
+</p>
+
+<div class="callout callout-amber">
+  <strong>Secret Management:</strong> Store <code>SQL_CONNECTION_STRING</code> and <code>JWT_SECRET</code>
+  as Azure Container Apps secrets (not plain environment variables) to prevent exposure in deployment logs.
+  Reference them using <code>secretref:&lt;secret-name&gt;</code> in the <code>--env-vars</code> flag.
+</div>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════ 11. DEV GUIDE ═══ -->
+<h1 id="dev-guide">11. Development Guide</h1>
+
+<h2>Prerequisites</h2>
+<ul>
+  <li>Node.js 20 or later</li>
+  <li>npm 9 or later</li>
+  <li>Access to an Azure SQL Database instance (or a local SQL Server for development)</li>
+</ul>
+
+<h2>Local Setup</h2>
+<pre><code># 1. Clone the repository
+git clone &lt;repo-url&gt;
+cd airport-reports
+
+# 2. Install frontend dependencies
+npm install
+
+# 3. Configure frontend environment
+echo "VITE_API_BASE_URL=http://localhost:3001/api" &gt; .env.local
+
+# 4. Install API dependencies
+cd api
+npm install
+
+# 5. Configure API environment
+cp .env.example .env
+# Edit api/.env — set SQL_CONNECTION_STRING and JWT_SECRET
+
+# 6. Start the API (in one terminal)
+npm run dev    # http://localhost:3001
+
+# 7. Start the frontend (in another terminal, from project root)
+cd ..
+npm run dev    # http://localhost:5173</code></pre>
+
+<h2>Project Structure</h2>
+<pre><code>airport-reports/
+├── src/
+│   ├── App.tsx                    # Root component — router, auth guards, store init
+│   ├── pages/
+│   │   ├── LoginPage.tsx          # Login form (site + admin paths)
+│   │   ├── DashboardPage.tsx      # Overview dashboard with KPI summary
+│   │   ├── OTPScorecardPage.tsx   # OTP ranking report
+│   │   ├── DelayAnalysisPage.tsx  # Delay breakdown report
+│   │   ├── AirlinePerformancePage.tsx
+│   │   ├── GateUtilizationPage.tsx
+│   │   ├── TaxiTimePage.tsx
+│   │   ├── BaggageBeltPage.tsx
+│   │   ├── BaggagePerformancePage.tsx
+│   │   ├── PassengerFlowPage.tsx
+│   │   ├── FlightOperationsPage.tsx  # Raw flight data table
+│   │   ├── ReportDesignerPage.tsx    # Custom report builder
+│   │   ├── CustomReportPage.tsx      # Viewer for saved custom reports
+│   │   ├── AdminPage.tsx             # App admin panel
+│   │   └── SettingsPage.tsx          # Site settings
+│   ├── components/
+│   │   ├── Layout.tsx             # App shell (sidebar, header)
+│   │   ├── FilterBar.tsx          # Shared filter controls
+│   │   ├── ProtectedRoute.tsx     # Auth guard components
+│   │   └── ui/
+│   │       ├── Card.tsx           # KPI card component
+│   │       ├── ExportMenu.tsx     # Excel / PDF export button
+│   │       ├── Badge.tsx          # Status badge component
+│   │       └── LoadingSpinner.tsx # Loading and error states
+│   ├── store/
+│   │   ├── useSessionStore.ts     # JWT session state
+│   │   ├── useSiteStore.ts        # Sites list state
+│   │   ├── useReportsStore.ts     # Saved reports state
+│   │   └── useSettingsStore.ts    # Per-report field config (localStorage)
+│   ├── hooks/
+│   │   └── useFlights.ts          # Flight data fetching + mock data fallback
+│   └── types/
+│       └── index.ts               # All TypeScript interfaces and constants
+├── api/
+│   └── src/
+│       ├── index.ts               # Express app entry point
+│       ├── db.ts                  # Azure SQL connection pool + migration runner
+│       └── routes/
+│           ├── auth.ts            # POST /api/auth/login, /refresh
+│           ├── sites.ts           # CRUD /api/sites
+│           ├── fields.ts          # CRUD /api/sites/:siteId/fields
+│           ├── reports.ts         # CRUD /api/reports + audit log
+│           ├── admins.ts          # CRUD /api/admins
+│           └── proxy.ts           # /api/proxy → APVe external API
+├── Dockerfile                     # Multi-stage production build
+├── package.json                   # Frontend dependencies
+├── vite.config.ts                 # Vite configuration
+└── tailwind.config.js             # Tailwind CSS configuration</code></pre>
+
+<h2>Adding a New Report</h2>
+<ol>
+  <li>Create <code>src/pages/MyNewReportPage.tsx</code>. Follow the pattern of an existing report page (e.g., <code>TaxiTimePage.tsx</code>):
+    <ul>
+      <li>Define a <code>DEFAULTS</code> constant for any configurable field names.</li>
+      <li>Define <code>DEFAULT_FILTERS</code> with a reasonable default date range.</li>
+      <li>Use the <code>useFlights</code> hook to fetch data.</li>
+      <li>Use <code>useMemo</code> to compute derived data from the <code>flights</code> array.</li>
+      <li>Render KPI cards, charts, and a data table.</li>
+      <li>Include an <code>ExportMenu</code> component.</li>
+    </ul>
+  </li>
+  <li>Add the route in <code>src/App.tsx</code>: <code>&lt;Route path="/reports/my-new-report" element={&lt;MyNewReportPage /&gt;} /&gt;</code></li>
+  <li>Add a navigation link in <code>src/components/Layout.tsx</code> in the sidebar nav array.</li>
+</ol>
+
+<hr class="section-divider" />
+
+<!-- ══════════════════════════════════════════════ 12. API ENDPOINTS ═══ -->
+<h1 id="api">12. API Endpoints</h1>
+
+<table>
+  <thead>
+    <tr><th>Method</th><th>Path</th><th>Auth</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><strong>POST</strong></td><td>/api/auth/login</td><td>Public</td><td>Authenticate user (site or app admin). Returns signed JWT.</td></tr>
+    <tr><td><strong>POST</strong></td><td>/api/auth/refresh</td><td>JWT</td><td>Silently refresh APVe publicAccessToken using stored apiKey.</td></tr>
+    <tr><td><strong>GET</strong></td><td>/api/sites</td><td>JWT</td><td>List all sites. App admins see all; site users see only their own site.</td></tr>
+    <tr><td><strong>POST</strong></td><td>/api/sites</td><td>Admin JWT</td><td>Create a new site.</td></tr>
+    <tr><td><strong>PUT</strong></td><td>/api/sites/:id</td><td>Admin JWT</td><td>Update a site's configuration.</td></tr>
+    <tr><td><strong>DELETE</strong></td><td>/api/sites/:id</td><td>Admin JWT</td><td>Delete a site.</td></tr>
+    <tr><td><strong>GET</strong></td><td>/api/sites/:siteId/fields</td><td>JWT</td><td>List field definitions for a site.</td></tr>
+    <tr><td><strong>POST</strong></td><td>/api/sites/:siteId/fields</td><td>Site Admin JWT</td><td>Create a custom field definition.</td></tr>
+    <tr><td><strong>PUT</strong></td><td>/api/sites/:siteId/fields/:id</td><td>Site Admin JWT</td><td>Update a field definition.</td></tr>
+    <tr><td><strong>DELETE</strong></td><td>/api/sites/:siteId/fields/:id</td><td>Site Admin JWT</td><td>Delete a field definition.</td></tr>
+    <tr><td><strong>GET</strong></td><td>/api/reports</td><td>JWT</td><td>List saved reports visible to the current user/site.</td></tr>
+    <tr><td><strong>POST</strong></td><td>/api/reports</td><td>JWT</td><td>Create a saved report.</td></tr>
+    <tr><td><strong>PUT</strong></td><td>/api/reports/:id</td><td>JWT</td><td>Update a saved report. Records audit log entry.</td></tr>
+    <tr><td><strong>DELETE</strong></td><td>/api/reports/:id</td><td>JWT</td><td>Delete a saved report. Records audit log entry.</td></tr>
+    <tr><td><strong>POST</strong></td><td>/api/reports/:id/clone</td><td>Admin JWT</td><td>Clone a template report to a specific site.</td></tr>
+    <tr><td><strong>GET</strong></td><td>/api/reports/:id/audit</td><td>JWT</td><td>Get audit log entries for a report.</td></tr>
+    <tr><td><strong>GET</strong></td><td>/api/admins</td><td>Admin JWT</td><td>List app admin accounts (passwords always masked as ••••••••).</td></tr>
+    <tr><td><strong>POST</strong></td><td>/api/admins</td><td>Admin JWT</td><td>Create a new app admin account (password is bcrypt-hashed).</td></tr>
+    <tr><td><strong>PUT</strong></td><td>/api/admins/:id</td><td>Admin JWT</td><td>Update an admin account (e.g., change password).</td></tr>
+    <tr><td><strong>DELETE</strong></td><td>/api/admins/:id</td><td>Admin JWT</td><td>Delete an app admin account.</td></tr>
+    <tr><td><strong>ALL</strong></td><td>/api/proxy/*</td><td>JWT</td><td>Server-side proxy to external APVe API. Forwards the full request (method, headers, raw body) and returns the APVe response.</td></tr>
+  </tbody>
+</table>
+
+<div class="callout callout-green">
+  <strong>Security Note:</strong> All <code>/api/*</code> routes (except <code>/api/auth/login</code>)
+  require a valid JWT in the <code>Authorization: Bearer &lt;token&gt;</code> header. Admin-only
+  endpoints additionally verify the <code>isAppAdmin</code> claim in the JWT. Raw password hashes
+  are never returned from any endpoint.
+</div>
+
+<hr class="section-divider" />
+
+<p style="text-align:center; color:#64748b; font-size:9.5pt; margin-top:40px;">
+  Airport Operations Dashboard — Technical Documentation &nbsp;|&nbsp; Version 1.0.0 &nbsp;|&nbsp; March 2026<br/>
+  Generated for internal use. All rights reserved.
+</p>
+
+</div><!-- /page -->
+</body>
+</html>
