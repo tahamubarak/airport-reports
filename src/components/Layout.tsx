@@ -22,6 +22,7 @@ import {
   Users,
   Timer,
   ConciergeBell,
+  ClipboardList,
 } from 'lucide-react';
 import { useSessionStore } from '../store/useSessionStore';
 import { useSiteStore } from '../store/useSiteStore';
@@ -48,6 +49,7 @@ const NAV_ITEMS: NavItem[] = [
   { path: '/reports/passenger-flow', label: 'Passenger Flow', icon: <Users className="w-5 h-5" />, group: 'Reports' },
   { path: '/reports/baggage-belt', label: 'Baggage Belt', icon: <ConciergeBell className="w-5 h-5" />, group: 'Reports' },
   { path: '/reports/taxi-time', label: 'Taxi Time', icon: <Timer className="w-5 h-5" />, group: 'Reports' },
+  { path: '/reports/checkin-counter', label: 'Check-In Counter', icon: <ClipboardList className="w-5 h-5" />, group: 'Reports' },
   { path: '/report-designer', label: 'Report Designer', icon: <Paintbrush className="w-5 h-5" />, adminOnly: true },
   { path: '/admin', label: 'Admin', icon: <Shield className="w-5 h-5" />, adminOnly: true },
 ];

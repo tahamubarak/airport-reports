@@ -23,12 +23,13 @@ const DEFAULT_FILTERS: FilterState = {
 };
 
 const FIELD_DEFAULTS = {
-  arrGateField:   'gate',
-  depGateField:   'gate',
-  arrSchedField:  'schedule',
-  arrActualField: 'actual',
-  depSchedField:  'schedule',
-  depActualField: 'actual',
+  arrGateField:      'gate',
+  depGateField:      'gate',
+  arrSchedField:     'schedule',
+  arrActualField:    'actual',
+  depSchedField:     'schedule',
+  depActualField:    'actual',
+  baseOccupancyMins: '45',
 };
 
 interface GanttBlock {
@@ -97,13 +98,14 @@ export const GateUtilizationPage: React.FC = () => {
       if (f.adi === 'A') stats[gate].arrivals++; else stats[gate].departures++;
       const sv = fr[sf];
       const av = fr[af];
+      const baseMins = Math.max(0, parseInt(cfg.baseOccupancyMins, 10) || 45);
       if (sv && av && f.status !== 'Cancelled') {
         try {
           const diff = Math.min(120, Math.abs(differenceInMinutes(parseISO(String(av)), parseISO(String(sv)))));
-          stats[gate].occupancyMins += 45 + diff;
-        } catch { stats[gate].occupancyMins += 45; }
+          stats[gate].occupancyMins += baseMins + diff;
+        } catch { stats[gate].occupancyMins += baseMins; }
       } else {
-        stats[gate].occupancyMins += 45;
+        stats[gate].occupancyMins += baseMins;
       }
     });
     return Object.entries(stats)
@@ -181,6 +183,10 @@ export const GateUtilizationPage: React.FC = () => {
             {inp('Gate field', 'depGateField', 'gate')}
             {inp('Actual Time', 'depActualField', 'actual')}
           </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">Occupancy</span>
+            {inp('Base (min)', 'baseOccupancyMins', '45')}
+          </div>
           <button
             onClick={handleApply}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors self-center"
@@ -198,7 +204,7 @@ export const GateUtilizationPage: React.FC = () => {
           )}
         </div>
         <p className="text-xs text-slate-400">
-          Avg Occupancy = base 45 min per flight + |actual − scheduled| (capped 120 min) &nbsp;·&nbsp; Set departure gate to <em>parkingbay</em> if your data uses Stand instead of Gate
+          Avg Occupancy = Base (min) per flight + |actual − scheduled| (capped 120 min) &nbsp;·&nbsp; Set departure gate to <em>parkingbay</em> if your data uses Stand instead of Gate
         </p>
       </div>
 
@@ -316,7 +322,7 @@ export const GateUtilizationPage: React.FC = () => {
                     <th className="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
                       <span className="inline-flex items-center justify-end gap-1">
                         Avg Occupancy
-                        <span title="Base 45 min + |actual − scheduled| per flight (capped 120 min)" className="cursor-help text-blue-400">
+                        <span title="Base occupancy (configurable, default 45 min) + |actual − scheduled| per flight (capped 120 min)" className="cursor-help text-blue-400">
                           <Info className="w-3 h-3" />
                         </span>
                       </span>

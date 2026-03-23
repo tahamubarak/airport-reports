@@ -140,13 +140,21 @@ export function parseFlightXML(xmlString: string): Flight[] {
       const siteIata = daily.getAttribute('site_iata') || '';
 
       const fieldMap: Record<string, string> = {};
+      const fieldInstances: Record<string, string[]> = {};
       const fieldElements = daily.querySelectorAll('field');
       fieldElements.forEach((field) => {
         const name = field.getAttribute('name');
         const value = field.getAttribute('value');
-        if (name && value !== null && value !== undefined && !fieldMap[name]) {
-          fieldMap[name] = value;
+        if (name && value !== null && value !== undefined) {
+          if (!fieldMap[name]) fieldMap[name] = value;
+          if (!fieldInstances[name]) fieldInstances[name] = [];
+          fieldInstances[name].push(value);
         }
+      });
+      // Store multi-instance fields as arrays (e.g. checkin_instances)
+      const instanceArrays: Record<string, unknown> = {};
+      Object.entries(fieldInstances).forEach(([name, vals]) => {
+        if (vals.length > 1) instanceArrays[`${name}_instances`] = vals;
       });
 
       const schedule = fieldMap['schedule'] ?? '';
@@ -190,6 +198,7 @@ export function parseFlightXML(xmlString: string): Flight[] {
       flights.push({
         // Spread ALL raw API fields first so custom fields (e.g. 'line') are accessible
         ...fieldMap,
+        ...instanceArrays,
         // Known/computed fields override the raw values below
         adi,
         scheduleDate,
@@ -284,7 +293,7 @@ export function generateMockFlights(startDate: Date, endDate: Date): Flight[] {
       const searchKey = `${flightKey} ${city} ${gate}`.toLowerCase();
 
       // ── Mock custom operational fields ──────────────────────────────────
-      const extraFields: Record<string, string> = {};
+      const extraFields: Record<string, unknown> = {};
       if (statusText !== 'Cancelled' && actualISO) {
         const actualMs = new Date(schedTime.getTime() + delayMinutes * 60000).getTime();
         if (adi === 'A') {
@@ -306,6 +315,15 @@ export function generateMockFlights(startDate: Date, endDate: Date): Flight[] {
           const ofchkMs = actualMs - taxiOutMins * 60000;
           extraFields['ofchk'] = new Date(ofchkMs).toISOString().replace('Z', '-05:00').slice(0, 25);
           extraFields['actualtime'] = actualISO;
+          // Check-in counters: 1–4 counters per departure flight
+          const counterCount = 1 + Math.floor(Math.random() * 4);
+          const allCounters = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+          const startIdx = Math.floor(Math.random() * (allCounters.length - counterCount));
+          const counterNums = allCounters.slice(startIdx, startIdx + counterCount);
+          extraFields['checkin'] = counterNums[0];
+          if (counterNums.length > 1) {
+            extraFields['checkin_instances'] = counterNums;
+          }
         }
       }
 

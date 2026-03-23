@@ -22,6 +22,7 @@ import { OTPScorecardPage } from './pages/OTPScorecardPage';
 import { PassengerFlowPage } from './pages/PassengerFlowPage';
 import { BaggageBeltPage } from './pages/BaggageBeltPage';
 import { TaxiTimePage } from './pages/TaxiTimePage';
+import { CheckInCounterPage } from './pages/CheckInCounterPage';
 
 function App() {
   const initialized = useSiteStore((s) => s.initialized);
@@ -108,6 +109,7 @@ function App() {
                   <Route path="/reports/passenger-flow" element={<PassengerFlowPage />} />
                   <Route path="/reports/baggage-belt" element={<BaggageBeltPage />} />
                   <Route path="/reports/taxi-time" element={<TaxiTimePage />} />
+                  <Route path="/reports/checkin-counter" element={<CheckInCounterPage />} />
                   <Route path="/report-designer" element={<ReportDesignerPage />} />
                   <Route path="/reports/custom/:id" element={<CustomReportPage />} />
                   <Route path="/settings" element={<SettingsPage />} />
