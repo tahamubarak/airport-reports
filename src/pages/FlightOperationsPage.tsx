@@ -282,11 +282,15 @@ export const FlightOperationsPage: React.FC = () => {
                           {flight.actual ? formatTime(flight.actual) : '—'}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-slate-600 font-mono text-xs">
-                        {(() => { const v = String((flight as Record<string, unknown>)[fieldConfig.onchkField] ?? ''); return v ? formatTime(v) : '—'; })()}
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-slate-800">
+                          {(() => { const v = String((flight as Record<string, unknown>)[fieldConfig.onchkField] ?? ''); return v ? formatTime(v) : '—'; })()}
+                        </div>
                       </td>
-                      <td className="px-4 py-3 text-slate-600 font-mono text-xs">
-                        {(() => { const v = String((flight as Record<string, unknown>)[fieldConfig.ofchkField] ?? ''); return v ? formatTime(v) : '—'; })()}
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-slate-800">
+                          {(() => { const v = String((flight as Record<string, unknown>)[fieldConfig.ofchkField] ?? ''); return v ? formatTime(v) : '—'; })()}
+                        </div>
                       </td>
                       <td className="px-4 py-3">
                         {flight.status === 'Cancelled' ? (
