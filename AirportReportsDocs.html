@@ -1448,6 +1448,104 @@ npm run dev    # http://localhost:5173</code></pre>
 
 <hr class="section-divider" />
 
+<!-- ══════════════════════════════════════ 13. EXTERNAL APVe API ENDPOINTS ═══ -->
+<h1 id="apve-api">13. External APVe API Endpoints</h1>
+
+<p>
+  All calls below are made from the browser-side code through the server-side proxy at
+  <code>/api/proxy/{host}{path}</code>. The <code>{baseUrl}</code> placeholder is the
+  APVe base URL configured per site (e.g. <code>https://apve.example.com/</code>).
+  None of these requests ever leave the browser directly — they are forwarded by the
+  Express proxy, which adds no additional authentication of its own.
+</p>
+
+<div class="callout callout-blue">
+  <strong>All five endpoints are reached via POST or GET only.</strong> No PUT, PATCH,
+  or DELETE calls are made to the APVe system.
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Method</th>
+      <th>Endpoint (relative to <code>{baseUrl}</code>)</th>
+      <th>Auth</th>
+      <th>Request Body / Params</th>
+      <th>Response</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>POST</strong></td>
+      <td><code>authApi/v1/api/Authentication/login</code></td>
+      <td>None (public)</td>
+      <td>JSON object: <code>{ userName, site, password }</code></td>
+      <td>JSON: <code>{ token }</code> (<code>accessToken</code>)</td>
+      <td>Step 1 of login. Validates APVe credentials and returns a short-lived session token.</td>
+    </tr>
+    <tr>
+      <td><strong>POST</strong></td>
+      <td><code>usersapi/v1/api/Users/GetByUserName?expand=activeApiKeys</code></td>
+      <td>Bearer <code>accessToken</code></td>
+      <td>JSON string (the username, quoted)</td>
+      <td>JSON: <code>User</code> object with linked <code>activeApiKeys</code></td>
+      <td>Step 2 (standard flow only). Fetches the user profile and their existing API keys. Skipped when a site <code>serviceApiKey</code> is configured.</td>
+    </tr>
+    <tr>
+      <td><strong>POST</strong></td>
+      <td><code>usersapi/v1/api/UserApiKeys</code></td>
+      <td>Bearer <code>accessToken</code></td>
+      <td>JSON object: <code>{ userId, activeStart, activeEnd, enabled, siteId }</code></td>
+      <td>JSON: <code>UserApiKey</code> object (includes <code>key</code> UUID)</td>
+      <td>Step 2b (standard flow only, on-demand). Creates a new API key if the user has none. Only called when <code>GetByUserName</code> returns no active keys.</td>
+    </tr>
+    <tr>
+      <td><strong>POST</strong></td>
+      <td><code>connectpublicapi/api/ConnectPublicApiAuthentication</code></td>
+      <td>None (public)</td>
+      <td>JSON string (the API key UUID, quoted)</td>
+      <td>JSON: <code>{ publicAccessToken }</code></td>
+      <td>Step 3 of login, and also used for silent token refresh. Exchanges an API key (user's own or site <code>serviceApiKey</code>) for a short-lived <code>publicAccessToken</code> used to query flight data.</td>
+    </tr>
+    <tr>
+      <td><strong>GET</strong></td>
+      <td><code>connectpublicapi/api/ConnectPublicDailies/Dailies</code></td>
+      <td>Bearer <code>publicAccessToken</code></td>
+      <td>Query params: <code>scheduleStartTime</code>, <code>scheduleEndTime</code> (ISO datetime strings)</td>
+      <td>XML flight schedule document</td>
+      <td>Primary data fetch. Returns all flight movements for the requested date range. Called on every dashboard/report load and on date-range changes. Retried once on 401/403 (with a fresh token) or on 503/504/timeout.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Authentication Sequence (Standard Flow)</h2>
+<ol>
+  <li><strong>POST</strong> <code>authApi/v1/api/Authentication/login</code> → get <code>accessToken</code></li>
+  <li><strong>POST</strong> <code>usersapi/v1/api/Users/GetByUserName?expand=activeApiKeys</code> → get existing API key UUID (or proceed to 2b)</li>
+  <li><em>(if no keys)</em> <strong>POST</strong> <code>usersapi/v1/api/UserApiKeys</code> → create API key UUID</li>
+  <li><strong>POST</strong> <code>connectpublicapi/api/ConnectPublicApiAuthentication</code> → get <code>publicAccessToken</code></li>
+  <li><strong>GET</strong> <code>connectpublicapi/api/ConnectPublicDailies/Dailies</code> → flight XML data</li>
+</ol>
+
+<h2>Authentication Sequence (Service-Key Flow)</h2>
+<p>When a site has a <code>serviceApiKey</code> configured, steps 2 and 3 above are skipped:</p>
+<ol>
+  <li><strong>POST</strong> <code>authApi/v1/api/Authentication/login</code> → validates credentials (token discarded)</li>
+  <li><strong>POST</strong> <code>connectpublicapi/api/ConnectPublicApiAuthentication</code> → get <code>publicAccessToken</code> using the site's <code>serviceApiKey</code></li>
+  <li><strong>GET</strong> <code>connectpublicapi/api/ConnectPublicDailies/Dailies</code> → flight XML data</li>
+</ol>
+
+<h2>Token Refresh (Silent)</h2>
+<p>
+  The <code>publicAccessToken</code> has a ~55-minute TTL. Before it expires, the app silently
+  calls <strong>POST</strong> <code>connectpublicapi/api/ConnectPublicApiAuthentication</code>
+  again using the stored API key — no user interaction required. The session itself is bounded
+  by an 8-hour hard limit, after which the user must log in again.
+</p>
+
+<hr class="section-divider" />
+
 <p style="text-align:center; color:#64748b; font-size:9.5pt; margin-top:40px;">
   Airport Operations Dashboard — Technical Documentation &nbsp;|&nbsp; Version 1.0.0 &nbsp;|&nbsp; March 2026<br/>
   Generated for internal use. All rights reserved.

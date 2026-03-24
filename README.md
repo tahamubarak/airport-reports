@@ -143,6 +143,26 @@ Login credentials are validated against the APVe external API. App admin credent
 
 ---
 
+## External APVe API Endpoints
+
+All calls to APVe are made via the server-side proxy (`/api/proxy`). The browser never contacts APVe directly. There are **5 endpoints used — all GET or POST only** (no PUT, PATCH, or DELETE).
+
+| Method | Endpoint (relative to site `baseUrl`) | Auth | Purpose |
+|---|---|---|---|
+| **POST** | `authApi/v1/api/Authentication/login` | None (public) | Validate APVe credentials; returns `accessToken` |
+| **POST** | `usersapi/v1/api/Users/GetByUserName?expand=activeApiKeys` | Bearer `accessToken` | Fetch user profile + existing API keys (standard flow only) |
+| **POST** | `usersapi/v1/api/UserApiKeys` | Bearer `accessToken` | Create a new API key if the user has none (standard flow, on-demand) |
+| **POST** | `connectpublicapi/api/ConnectPublicApiAuthentication` | None (public) | Exchange API key for `publicAccessToken`; also used for silent refresh |
+| **GET** | `connectpublicapi/api/ConnectPublicDailies/Dailies` | Bearer `publicAccessToken` | Fetch flight schedule XML for a date range |
+
+**Standard flow** (no `serviceApiKey`): all 5 steps above in sequence.
+**Service-key flow** (site has `serviceApiKey`): step 1 validates credentials, then step 4 uses the site key directly — steps 2 and 3 are skipped.
+**Silent token refresh**: step 4 is called automatically before `publicAccessToken` expiry (~55 min TTL) using the stored API key.
+
+The `baseUrl` and `serviceApiKey` for each site are configured in the Admin panel and stored in Azure SQL. See `src/services/authService.ts` for the implementation.
+
+---
+
 ## Development Setup
 
 ### Prerequisites
