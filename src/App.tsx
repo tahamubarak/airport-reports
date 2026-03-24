@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { useSiteStore } from './store/useSiteStore';
 import { useSessionStore } from './store/useSessionStore';
 import { useReportsStore } from './store/useReportsStore';
+import { useFlightStore, DEFAULT_FLIGHT_DATE_RANGE } from './store/useFlightStore';
 import { Layout } from './components/Layout';
 import { ProtectedRoute, AdminRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
@@ -29,6 +30,7 @@ function App() {
   const session = useSessionStore((s) => s.session);
   const adminToken = useSessionStore((s) => s.adminToken);
   const siteToken = useSessionStore((s) => s.siteToken);
+  const adminActiveSiteId = session?.adminActiveSiteId;
   const [initStarted, setInitStarted] = useState(false);
 
   // Always initialize siteStore on mount (sets initialized=true even on failure so spinner clears)
@@ -53,6 +55,25 @@ function App() {
       useReportsStore.getState().initialize();
     }
   }, [adminToken, siteToken]);
+
+  // Fetch flight data once when a token becomes available (i.e. on login).
+  // After that, data is only refreshed when the user explicitly clicks Refresh
+  // on any report page, or when the active site changes (admin site-switch).
+  useEffect(() => {
+    const token = adminToken ?? siteToken;
+    if (token) {
+      useFlightStore.getState().fetchFlights(DEFAULT_FLIGHT_DATE_RANGE);
+    }
+  }, [adminToken, siteToken]);
+
+  // Re-fetch when app-admin switches active site
+  useEffect(() => {
+    if (adminActiveSiteId) {
+      useFlightStore.getState().fetchFlights(
+        useFlightStore.getState().lastDateRange ?? DEFAULT_FLIGHT_DATE_RANGE
+      );
+    }
+  }, [adminActiveSiteId]);
 
   // While loading and no session yet, show a brief spinner
   if (initStarted && !initialized && !session) {

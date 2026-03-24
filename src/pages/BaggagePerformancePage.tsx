@@ -55,15 +55,9 @@ export const BaggagePerformancePage: React.FC = () => {
   const { config: fieldConfig, apply: applyFieldConfig } = usePersistedConfig('baggage_performance', DEFAULTS);
   const [draft, setDraft] = useState<FieldConfig>(DEFAULTS);
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
-  const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
-
   // Sync draft when persisted config loads (site change)
   const cfgStr = JSON.stringify(fieldConfig);
   useEffect(() => { try { setDraft(JSON.parse(cfgStr)); } catch {} }, [cfgStr]);
-
-  useEffect(() => {
-    fetchFlights(filters.dateRange);
-  }, [adminActiveSiteId]);
 
   const handleRefresh = () => fetchFlights(filters.dateRange);
   const handleApply = () => applyFieldConfig({ ...draft });

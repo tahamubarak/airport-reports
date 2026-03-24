@@ -48,9 +48,6 @@ export const CheckInCounterPage: React.FC = () => {
   useEffect(() => { try { setDraft(JSON.parse(cfgStr)); } catch {} }, [cfgStr]);
 
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
-  const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
-
-  useEffect(() => { fetchFlights(filters.dateRange); }, [adminActiveSiteId]);
   const handleRefresh = () => fetchFlights(filters.dateRange);
 
   const handleApply = () => applyConfig({ ...draft });

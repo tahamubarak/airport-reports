@@ -66,8 +66,6 @@ export const FlightOperationsPage: React.FC = () => {
   const { config: fieldConfig, apply: applyFieldConfig } = usePersistedConfig('flight_operations', DEFAULTS);
   const [draft, setDraft] = useState(DEFAULTS);
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
-  const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
-
   // Sync draft when persisted config loads
   const cfgStr = JSON.stringify(fieldConfig);
   useEffect(() => { try { setDraft(JSON.parse(cfgStr)); } catch {} }, [cfgStr]); // eslint-disable-line
@@ -86,10 +84,6 @@ export const FlightOperationsPage: React.FC = () => {
       />
     </div>
   );
-
-  useEffect(() => {
-    fetchFlights(filters.dateRange);
-  }, [adminActiveSiteId]);
 
   const handleRefresh = useCallback(() => {
     fetchFlights(filters.dateRange);

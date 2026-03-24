@@ -54,12 +54,6 @@ export const DashboardPage: React.FC = () => {
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const { flights, loading, error, isCorsError, isUsingMockData, lastFetched, fetchFlights } = useFlights();
   const { session } = useSessionStore();
-  const adminActiveSiteId = session?.adminActiveSiteId;
-
-  useEffect(() => {
-    fetchFlights(filters.dateRange);
-  }, [adminActiveSiteId]);
-
   const handleRefresh = () => {
     fetchFlights(filters.dateRange);
   };

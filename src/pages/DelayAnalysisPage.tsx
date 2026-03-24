@@ -39,8 +39,6 @@ export const DelayAnalysisPage: React.FC = () => {
   const { config: fieldCfg, apply: applyFieldCfg } = usePersistedConfig('delay_analysis', DELAY_DEFAULTS);
   const [actualFieldInput, setActualFieldInput] = useState(fieldCfg.actualField);
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
-  const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
-
   const actualField = fieldCfg.actualField;
 
   // Sync input when persisted config loads
@@ -48,10 +46,6 @@ export const DelayAnalysisPage: React.FC = () => {
   useEffect(() => { setActualFieldInput(fieldCfg.actualField); }, [cfgStr]); // eslint-disable-line
 
   const handleApply = () => applyFieldCfg({ actualField: actualFieldInput.trim() || 'actual' });
-
-  useEffect(() => {
-    fetchFlights(filters.dateRange);
-  }, [adminActiveSiteId]);
 
   const handleRefresh = () => fetchFlights(filters.dateRange);
 

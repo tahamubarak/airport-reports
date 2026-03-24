@@ -75,12 +75,6 @@ export const PassengerFlowPage: React.FC = () => {
   const [paxPerFlight, setPaxPerFlight] = useState(DEFAULT_PAX_PER_FLIGHT);
   const [paxInput, setPaxInput] = useState(String(DEFAULT_PAX_PER_FLIGHT));
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
-  const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
-
-  useEffect(() => {
-    fetchFlights(filters.dateRange);
-  }, [adminActiveSiteId]);
-
   const handleRefresh = () => fetchFlights(filters.dateRange);
 
   const handleApplyPax = () => {

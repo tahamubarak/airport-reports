@@ -164,9 +164,6 @@ export const BaggageBeltPage: React.FC = () => {
   const [filters, setFilters]     = useState<FilterState>(DEFAULT_FILTERS);
   const { config: fieldConfig, apply: applyFieldConfig } = usePersistedConfig('baggage_belt', DEFAULTS);
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
-  const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
-
-  useEffect(() => { fetchFlights(filters.dateRange); }, [adminActiveSiteId]);
   const handleRefresh = () => fetchFlights(filters.dateRange);
 
   const airlines = useMemo(() => [...new Set(flights.map(f => f.linecode))].sort(), [flights]);

@@ -34,7 +34,6 @@ export const CustomReportPage: React.FC = () => {
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const { flights, loading, error, isCorsError, isUsingMockData, fetchFlights } = useFlights();
   const session = useSessionStore((s) => s.session);
-  const adminActiveSiteId = useSessionStore((s) => s.session?.adminActiveSiteId);
   const { reports } = useReportsStore();
   const { getSiteFieldDefinitions } = useSiteStore();
 
@@ -68,10 +67,6 @@ export const CustomReportPage: React.FC = () => {
       };
     });
   }, [report, fieldDefs]);
-
-  useEffect(() => {
-    fetchFlights(filters.dateRange);
-  }, [adminActiveSiteId]);
 
   useEffect(() => {
     if (report && !filtersInitialized) {
