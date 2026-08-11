@@ -8,6 +8,8 @@ import sitesRouter from './routes/sites';
 import fieldsRouter from './routes/fields';
 import reportsRouter from './routes/reports';
 import adminsRouter from './routes/admins';
+import activityRouter from './routes/activity';
+import settingsRouter from './routes/settings';
 import proxyRouter from './routes/proxy';
 import { runMigrations } from './db';
 
@@ -34,6 +36,8 @@ app.use('/api/sites', sitesRouter);
 app.use('/api/sites/:siteId/fields', fieldsRouter);
 app.use('/api/reports', reportsRouter);
 app.use('/api/admins', adminsRouter);
+app.use('/api/activity', activityRouter);
+app.use('/api/settings', settingsRouter);
 
 // Server-side proxy for external APVe API calls (avoids browser CORS restrictions)
 // All external calls are routed through here: /api/proxy/{host}/{path}

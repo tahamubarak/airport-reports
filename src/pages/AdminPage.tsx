@@ -3,18 +3,20 @@ import { useNavigate } from 'react-router-dom';
 import {
   Globe, Building2, Plus, Trash2, Edit2, X, Check,
   ToggleLeft, ToggleRight, Wifi, WifiOff, RefreshCw,
-  Shield, Palette, Code2,
+  Shield, Palette, Code2, Activity, Clock,
   AlertTriangle, Settings2, FileText, History,
 } from 'lucide-react';
 import axios from 'axios';
 import { apiUrl } from '../services/authService';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { ExportMenu } from '../components/ui/ExportMenu';
 import { useSiteStore } from '../store/useSiteStore';
 import { useReportsStore } from '../store/useReportsStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { useActivityStore } from '../store/useActivityStore';
 import {
-  Site, AppAdmin, SavedReport, ReportAuditEntry, FieldDefinition, FieldType,
+  Site, AppAdmin, SavedReport, ReportAuditEntry, UserActivityEntry, FieldDefinition, FieldType,
   ColorRule, ColorRuleOperator, FieldExpression, FieldExpressionType,
   DEFAULT_FIELD_DEFINITIONS, COLOR_RULE_OPERATORS, PRESET_DATE_FORMATS, AVAILABLE_FIELDS,
 } from '../types';
@@ -1282,6 +1284,168 @@ const GlobalConfigPanel: React.FC = () => {
   );
 };
 
+// ─── User Activity Panel (app admin only) ─────────────────────────────────────
+
+const activityTypeLabel = (t: UserActivityEntry['activityType']) => (t === 'login' ? 'Login' : 'Data Load');
+
+const UserActivityPanel: React.FC = () => {
+  const { sites } = useSiteStore();
+  const { retentionDays, fetchActivity, fetchRetentionDays, updateRetentionDays } = useActivityStore();
+  const enabledSites = sites; // app admin can review any configured site, enabled or not
+  const [selectedSiteId, setSelectedSiteId] = useState(enabledSites[0]?.id ?? '');
+  const [entries, setEntries] = useState<UserActivityEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [retentionInput, setRetentionInput] = useState(String(retentionDays));
+  const [savingRetention, setSavingRetention] = useState(false);
+
+  React.useEffect(() => {
+    fetchRetentionDays()
+      .then(() => {})
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    setRetentionInput(String(retentionDays));
+  }, [retentionDays]);
+
+  const loadEntries = React.useCallback((siteId: string) => {
+    if (!siteId) { setEntries([]); return; }
+    setLoading(true);
+    fetchActivity(siteId)
+      .then(setEntries)
+      .catch(() => toast.error('Failed to load activity log'))
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    loadEntries(selectedSiteId);
+  }, [selectedSiteId, loadEntries]);
+
+  const handleSaveRetention = async () => {
+    const days = parseInt(retentionInput, 10);
+    if (!Number.isFinite(days) || days < 1 || days > 3650) {
+      toast.error('Retention must be between 1 and 3650 days');
+      return;
+    }
+    setSavingRetention(true);
+    try {
+      await updateRetentionDays(days);
+      toast.success('Retention period updated');
+    } catch {
+      toast.error('Failed to update retention period');
+    } finally {
+      setSavingRetention(false);
+    }
+  };
+
+  const selectedSite = sites.find((s) => s.id === selectedSiteId);
+
+  const exportData = entries.map((e) => ({
+    Site: selectedSite?.iataCode ?? '',
+    Username: e.username,
+    Type: activityTypeLabel(e.activityType),
+    'Log Time': new Date(e.logTime).toLocaleString(),
+    'Load Start': e.loadStartDate ?? '',
+    'Load End': e.loadEndDate ?? '',
+  }));
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <Activity className="w-6 h-6 text-amber-600" />
+        <h2 className="text-xl font-bold text-slate-800">User Activities</h2>
+      </div>
+
+      <Card>
+        <div className="flex items-center gap-3 mb-3">
+          <Clock className="w-4 h-4 text-slate-500" />
+          <h3 className="text-sm font-semibold text-slate-700">Retention Period</h3>
+        </div>
+        <div className="flex items-center gap-3">
+          <input
+            type="number" min={1} max={3650}
+            value={retentionInput}
+            onChange={(e) => setRetentionInput(e.target.value)}
+            className="w-28 border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <span className="text-sm text-slate-500">days — entries older than this are purged automatically</span>
+          <Button variant="primary" onClick={handleSaveRetention} disabled={savingRetention}>
+            {savingRetention ? 'Saving…' : 'Save'}
+          </Button>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium text-slate-700">Site</label>
+            <select
+              value={selectedSiteId}
+              onChange={(e) => setSelectedSiteId(e.target.value)}
+              className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {enabledSites.length === 0 && <option value="">No sites configured</option>}
+              {enabledSites.map((s) => (
+                <option key={s.id} value={s.id}>{s.iataCode} — {s.name}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => loadEntries(selectedSiteId)}
+              className="text-slate-400 hover:text-blue-600"
+              title="Refresh"
+            >
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+          <ExportMenu
+            data={exportData}
+            title={`User Activities — ${selectedSite?.iataCode ?? ''}`}
+            filename="user-activities"
+            disabled={exportData.length === 0}
+          />
+        </div>
+
+        {loading ? (
+          <p className="text-sm text-slate-400 text-center py-8">Loading…</p>
+        ) : entries.length === 0 ? (
+          <p className="text-sm text-slate-400 text-center py-8">No activity recorded for this site yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-slate-100 text-left">
+                  <th className="pb-2 font-semibold text-slate-600">Username</th>
+                  <th className="pb-2 font-semibold text-slate-600">Type</th>
+                  <th className="pb-2 font-semibold text-slate-600">Log Time</th>
+                  <th className="pb-2 font-semibold text-slate-600">Load Start</th>
+                  <th className="pb-2 font-semibold text-slate-600">Load End</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {entries.map((e) => (
+                  <tr key={e.id}>
+                    <td className="py-2 text-slate-700">{e.username}</td>
+                    <td className="py-2">
+                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${e.activityType === 'login' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                        {activityTypeLabel(e.activityType)}
+                      </span>
+                    </td>
+                    <td className="py-2 text-slate-500">{new Date(e.logTime).toLocaleString()}</td>
+                    <td className="py-2 text-slate-500">{e.loadStartDate ?? '—'}</td>
+                    <td className="py-2 text-slate-500">{e.loadEndDate ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </div>
+  );
+};
+
 // ─── App Admin Layout ─────────────────────────────────────────────────────────
 
 const AppAdminLayout: React.FC = () => {
@@ -1290,6 +1454,7 @@ const AppAdminLayout: React.FC = () => {
   const activeSiteId = session?.adminActiveSiteId ?? null;
   const [showSiteModal, setShowSiteModal] = useState(false);
   const [editingSite, setEditingSite] = useState<Site | undefined>(undefined);
+  const [showActivity, setShowActivity] = useState(false);
 
   const handleSaveSite = (data: Omit<Site, 'id'>) => {
     if (editingSite) {
@@ -1323,19 +1488,28 @@ const AppAdminLayout: React.FC = () => {
         <div className="flex-1 overflow-y-auto">
           {/* Global Config */}
           <button
-            onClick={() => setAdminActiveSite(null)}
-            className={`w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors border-b border-slate-100 ${activeSiteId === null ? 'bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-600' : 'text-slate-600 hover:bg-slate-100'}`}
+            onClick={() => { setAdminActiveSite(null); setShowActivity(false); }}
+            className={`w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors border-b border-slate-100 ${activeSiteId === null && !showActivity ? 'bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-600' : 'text-slate-600 hover:bg-slate-100'}`}
           >
             <Globe className="w-4 h-4 flex-shrink-0" />
             Global Config
+          </button>
+
+          {/* User Activities */}
+          <button
+            onClick={() => setShowActivity(true)}
+            className={`w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors border-b border-slate-100 ${showActivity ? 'bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-600' : 'text-slate-600 hover:bg-slate-100'}`}
+          >
+            <Activity className="w-4 h-4 flex-shrink-0" />
+            User Activities
           </button>
 
           {/* Sites */}
           {sites.map((site) => (
             <div key={site.id} className="group relative">
               <button
-                onClick={() => setAdminActiveSite(site.id)}
-                className={`w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors ${activeSiteId === site.id ? 'bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-600' : 'text-slate-600 hover:bg-slate-100'}`}
+                onClick={() => { setAdminActiveSite(site.id); setShowActivity(false); }}
+                className={`w-full text-left px-4 py-3 text-sm flex items-center gap-2 transition-colors ${activeSiteId === site.id && !showActivity ? 'bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-600' : 'text-slate-600 hover:bg-slate-100'}`}
               >
                 <span className="text-xs font-bold font-mono bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded flex-shrink-0">{site.iataCode}</span>
                 <span className="truncate">{site.name}</span>
@@ -1361,7 +1535,9 @@ const AppAdminLayout: React.FC = () => {
 
       {/* Main panel */}
       <div className="flex-1 overflow-y-auto p-6">
-        {activeSiteId === null ? (
+        {showActivity ? (
+          <UserActivityPanel />
+        ) : activeSiteId === null ? (
           <GlobalConfigPanel />
         ) : (
           <SiteConfigPanel key={activeSiteId} siteId={activeSiteId} />

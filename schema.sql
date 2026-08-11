@@ -92,3 +92,22 @@ CREATE TABLE report_site_assignments (
 --   snapshot_before NVARCHAR(MAX) NULL,              -- full report JSON before change
 --   snapshot_after  NVARCHAR(MAX) NULL               -- full report JSON after change
 -- );
+
+-- User activity log: tracks site-user logins and data loads/refreshes (app-admin viewable, per site)
+-- CREATE TABLE user_activity_log (
+--   id              NVARCHAR(50)  NOT NULL PRIMARY KEY,
+--   site_id         NVARCHAR(50)  NOT NULL,           -- which site the user logged into
+--   username        NVARCHAR(100) NOT NULL,
+--   activity_type   NVARCHAR(20)  NOT NULL,           -- 'login' | 'data_load'
+--   log_time        DATETIME2     DEFAULT GETUTCDATE(),
+--   load_start_date DATE          NULL,               -- only set for 'data_load'
+--   load_end_date   DATE          NULL
+-- );
+-- CREATE INDEX IX_activity_site_time ON user_activity_log(site_id, log_time DESC);
+
+-- App-level key/value settings (e.g. activity log retention period, default 30 days)
+-- CREATE TABLE app_settings (
+--   setting_key   NVARCHAR(100) NOT NULL PRIMARY KEY,
+--   setting_value NVARCHAR(500) NOT NULL,
+--   updated_at    DATETIME2 DEFAULT GETUTCDATE()
+-- );

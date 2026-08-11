@@ -5,6 +5,7 @@ import { useSiteStore } from '../store/useSiteStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { authService } from '../services/authService';
 import { apiClient } from '../services/apiClient';
+import { useActivityStore } from '../store/useActivityStore';
 import toast from 'react-hot-toast';
 
 export const LoginPage: React.FC = () => {
@@ -87,6 +88,7 @@ export const LoginPage: React.FC = () => {
           { username: username.trim(), siteId: matchedSite.id }
         );
         useSessionStore.getState().setSiteToken(tokenRes.data.token);
+        useActivityStore.getState().logLogin();
       } catch {
         // Non-fatal: the user can still view the UI; write operations will be restricted
         console.warn('[auth] Could not obtain site token');

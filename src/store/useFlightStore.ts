@@ -5,6 +5,7 @@ import { parseFlightXML, generateMockFlights } from '../utils/flightParser';
 import { format, addDays } from 'date-fns';
 import toast from 'react-hot-toast';
 import { useSessionStore } from './useSessionStore';
+import { useActivityStore } from './useActivityStore';
 
 export const DEFAULT_FLIGHT_DATE_RANGE: DateRange = {
   startDate: new Date(),
@@ -45,6 +46,7 @@ export const useFlightStore = create<FlightStoreState>((set, get) => ({
       const parsed  = parseFlightXML(xmlData);
 
       set({ flights: parsed, lastFetched: new Date(), lastDateRange: dateRange, loading: false });
+      useActivityStore.getState().logDataLoad(dateRange);
 
       if (parsed.length === 0) {
         toast('No flights found for the selected date range.', { icon: 'ℹ️' });

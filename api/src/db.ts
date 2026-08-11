@@ -116,6 +116,45 @@ export async function runMigrations(): Promise<void> {
       IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_audit_changed_at' AND object_id = OBJECT_ID('report_audit_log'))
       CREATE INDEX IX_audit_changed_at ON report_audit_log(changed_at DESC)
     `);
+    // Create user_activity_log table (login + data-load audit trail for site users)
+    await p.request().query(`
+      IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'user_activity_log')
+      CREATE TABLE user_activity_log (
+        id              NVARCHAR(50)  NOT NULL PRIMARY KEY,
+        site_id         NVARCHAR(50)  NOT NULL,
+        username        NVARCHAR(100) NOT NULL,
+        activity_type   NVARCHAR(20)  NOT NULL,
+        log_time        DATETIME2     DEFAULT GETUTCDATE(),
+        load_start_date DATE          NULL,
+        load_end_date   DATE          NULL
+      )
+    `);
+    await p.request().query(`
+      IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IX_activity_site_time' AND object_id = OBJECT_ID('user_activity_log'))
+      CREATE INDEX IX_activity_site_time ON user_activity_log(site_id, log_time DESC)
+    `);
+    // Create app_settings key/value table (e.g. activity log retention period)
+    await p.request().query(`
+      IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'app_settings')
+      CREATE TABLE app_settings (
+        setting_key   NVARCHAR(100) NOT NULL PRIMARY KEY,
+        setting_value NVARCHAR(500) NOT NULL,
+        updated_at    DATETIME2 DEFAULT GETUTCDATE()
+      )
+    `);
+    await p.request().query(`
+      IF NOT EXISTS (SELECT 1 FROM app_settings WHERE setting_key = 'activity_log_retention_days')
+      INSERT INTO app_settings (setting_key, setting_value) VALUES ('activity_log_retention_days', '30')
+    `);
+    // Purge expired activity rows on startup, based on the configured retention period
+    await p.request().query(`
+      DELETE FROM user_activity_log
+      WHERE log_time < DATEADD(
+        day,
+        -CAST((SELECT setting_value FROM app_settings WHERE setting_key = 'activity_log_retention_days') AS INT),
+        GETUTCDATE()
+      )
+    `);
     console.log('[db] Migrations complete');
   } catch (err) {
     console.error('[db] Migration error:', err);

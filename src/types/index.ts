@@ -205,6 +205,16 @@ export interface SavedReport {
 }
 
 // ─── Report Audit Log ─────────────────────────────────────────────────────────
+export interface UserActivityEntry {
+  id: string;
+  siteId: string;
+  username: string;
+  activityType: 'login' | 'data_load';
+  logTime: string;
+  loadStartDate?: string | null;
+  loadEndDate?: string | null;
+}
+
 export interface ReportAuditEntry {
   id: string;
   reportId: string;
